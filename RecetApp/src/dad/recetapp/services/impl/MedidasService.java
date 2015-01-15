@@ -11,7 +11,7 @@ import dad.recetapp.db.BaseDatos;
 import dad.recetapp.services.IMedidasService;
 import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.items.MedidaItem;
-
+//asdasd
 public class MedidasService implements IMedidasService {
 
 	@Override
