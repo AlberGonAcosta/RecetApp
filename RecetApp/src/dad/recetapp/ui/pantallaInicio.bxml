@@ -1,0 +1,7 @@
+<Window
+    xmlns:bxml="http://pivot.apache.org/bxml"
+    xmlns="org.apache.pivot.wtk">
+    <BoxPane orientation="vertical" styles="{horizontalAlignment:'center', spacing:10}">
+       <ImageView image="/dad/recetapp/ui/images/recetapp-inicio.png" preferredWidth="472" preferredHeight="250"/>
+    </BoxPane> 
+</Window>
