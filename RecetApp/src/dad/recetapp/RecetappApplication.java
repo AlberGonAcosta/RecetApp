@@ -10,38 +10,43 @@ import org.apache.pivot.wtk.Application;
 import org.apache.pivot.wtk.Display;
 import org.apache.pivot.wtk.Window;
 
+import dad.recetapp.ui.PantallaInicio;
+import dad.recetapp.ui.images.Image;
+
 public class RecetappApplication implements Application{
-	 
-	 private Window pantallaInicioDialog;
-	    @Override
-	    public void startup(Display display, Map<String, String> properties) throws Exception {
-	    	pantallaInicioDialog = (Window) loadWindow("dad/recetapp/ui/pantallaInicio.bxml");
-	    	pantallaInicioDialog.open(display);
-	    	java.awt.Frame hostFrame = (java.awt.Frame)display.getDisplayHost().getParent();
-	    	hostFrame.setLocationRelativeTo(null);
-	    	hostFrame.setResizable(true);
-	    }
-	    
-	    public static Window loadWindow(String bxmlFile) throws IOException, SerializationException {
-			URL bxmlUrl = RecetappApplication.class.getClassLoader().getResource(bxmlFile);
-			BXMLSerializer serializer = new BXMLSerializer();
-			return (Window) serializer.readObject(bxmlUrl);
-		}
-	 
-	    @Override
-	    public boolean shutdown(boolean optional) {
-	        if (pantallaInicioDialog != null) {
-	        	pantallaInicioDialog.close();
-	        }
-	 
-	        return false;
-	    }
-	 
-	    @Override
-	    public void suspend() {
-	    }
-	 
-	    @Override
-	    public void resume() {
-	    }
+	
+	private PantallaInicio pantallaInicio = null;
+	
+	public static Window loadWindow(String bxmlFile) throws IOException, SerializationException {
+		URL bxmlUrl = RecetappApplication.class.getClassLoader().getResource(bxmlFile);
+		BXMLSerializer serializer = new BXMLSerializer();
+		return (Window) serializer.readObject(bxmlUrl);
+	}
+	
+	@Override
+	public void startup(Display display, Map<String, String> properties) throws Exception {
+		
+		pantallaInicio = (PantallaInicio) loadWindow("dad/recetapp/ui/PantallaInicio.bxml");
+		pantallaInicio.open(display);
+		pantallaInicio.setTitle("RecetApp");
+		java.awt.Window frame = display.getHostWindow();
+		frame.setIconImage(Image.LOGO_ICON.getImage());
+	}
+	
+	@Override
+	public boolean shutdown(boolean optional) throws Exception {
+		
+		if (pantallaInicio != null) 
+			pantallaInicio.close();
+		
+		return false;
+	}
+	
+	@Override
+	public void resume() throws Exception {}
+
+
+	@Override
+	public void suspend() throws Exception {}
+
 }
