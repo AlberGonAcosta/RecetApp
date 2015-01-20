@@ -42,7 +42,7 @@ public class TiposIngredientesService implements ITiposIngredientesService {
 	public void modificarTipoIngrediente(TipoIngredienteItem tipo) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("UPDATE FROM tipos_ingredientes SET nombre = ? WHERE id = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE tipos_ingredientes SET nombre = ? WHERE id = ?");
 			statement.setString(1, tipo.getNombre());
 			statement.setLong(2, tipo.getId());
 			statement.executeUpdate();

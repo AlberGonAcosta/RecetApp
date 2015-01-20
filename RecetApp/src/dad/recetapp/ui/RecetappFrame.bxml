@@ -50,8 +50,9 @@
 	        </TablePane.Row>
 	        <TablePane.Row height="-1">
 		        <BoxPane styles="{padding:4, verticalAlignment:'center'}">
-	        		<Label bxml:id="numRecetasPane" text="Recetas: "/>
-	    		</BoxPane>
+	        		<Label text="Recetas: "/>
+	        		<Label bxml:id="numRecetasPane" text=""/>
+	    		</BoxPane>    		
 	        </TablePane.Row>
 
 		

@@ -8,6 +8,9 @@ import org.apache.pivot.collections.Map;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.Label;
 import org.apache.pivot.wtk.Window;
+
+import dad.recetapp.services.ServiceException;
+import dad.recetapp.services.ServiceLocator;
  
 public class RecetappFrame extends Window implements Bindable {
 	
@@ -20,6 +23,12 @@ public class RecetappFrame extends Window implements Bindable {
     @Override
     public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
     	recetappFrame.setIcon("/dad/recetapp/ui/images/logo.png");
+    	
+    	try {
+			numRecetasPane.setText(String.valueOf(ServiceLocator.getRecetasService().listarRecetas().size()));
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
     }
  
 }

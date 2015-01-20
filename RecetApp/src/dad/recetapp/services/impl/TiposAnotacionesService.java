@@ -42,7 +42,7 @@ public class TiposAnotacionesService implements ITiposAnotacionesService {
 	public void modificarTipoAnotacion(TipoAnotacionItem tipo) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("UPDATE FROM tipos_anotaciones SET descripcion = ? WHERE id = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE tipos_anotaciones SET descripcion = ? WHERE id = ?");
 			statement.setString(1, tipo.getDescripcion());
 			statement.setLong(2, tipo.getId());
 			statement.executeUpdate();

@@ -33,7 +33,7 @@ public class RecetasService implements IRecetasService {
 
 			receta.setFechaCreacion(new Date()); 
 
-			PreparedStatement sentencia = conn.prepareStatement("insert into recetas (nombre, fecha_creacion, cantidad, para, tiempo_total, tiempo_thermomix, id_categoria) values (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement sentencia = conn.prepareStatement("INSERT INTO recetas (nombre, fecha_creacion, cantidad, para, tiempo_total, tiempo_thermomix, id_categoria) VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			sentencia.setString(1, receta.getNombre());
 			sentencia.setDate(2, new java.sql.Date(receta.getFechaCreacion().getTime()));
 			sentencia.setInt(3, receta.getCantidad());
@@ -82,7 +82,7 @@ public class RecetasService implements IRecetasService {
 
 			RecetaItem recetaActual = obtenerReceta(receta.getId());
 
-			PreparedStatement sentencia = conn.prepareStatement("update recetas set nombre=?, cantidad=?, para=?, tiempo_total=?, tiempo_thermomix=?, id_categoria=? where id=?");
+			PreparedStatement sentencia = conn.prepareStatement("UPDATE recetas SET nombre=?, cantidad=?, para=?, tiempo_total=?, tiempo_thermomix=?, id_categoria=? WHERE id=?");
 			sentencia.setString(1, receta.getNombre());
 			sentencia.setInt(2, receta.getCantidad());
 			sentencia.setString(3, receta.getPara());
@@ -135,7 +135,7 @@ public class RecetasService implements IRecetasService {
 	public void eliminarReceta(Long id) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement sentencia = conn.prepareStatement("delete from recetas where id=?");
+			PreparedStatement sentencia = conn.prepareStatement("DELETE FROM recetas WHERE id=?");
 			sentencia.setLong(1, id);
 			sentencia.execute();
 			sentencia.close();
@@ -149,10 +149,10 @@ public class RecetasService implements IRecetasService {
 		try {
 			Connection conn = BaseDatos.getConnection();
 
-			String sql = "select r.*, c.descripcion as categoria from recetas r left join categorias c on r.id_categoria=c.id where nombre like ?";
+			String sql = "SELECT r.*, c.descripcion AS categoria FROM recetas r LEFT JOIN categorias c ON r.id_categoria=c.id WHERE nombre LIKE ?";
 			if (nombre == null) nombre = "";
-			if (tiempoTotal != null) sql += " and tiempo_total<=?";
-			if (idCategoria != null) sql += " and id_categoria=?";
+			if (tiempoTotal != null) sql += " AND tiempo_total<=?";
+			if (idCategoria != null) sql += " AND id_categoria=?";
 
 			PreparedStatement sentencia = conn.prepareStatement(sql);
 			sentencia.setString(1, "%" + nombre + "%");
@@ -183,7 +183,7 @@ public class RecetasService implements IRecetasService {
 		try {
 			Connection conn = BaseDatos.getConnection();
 			Statement sentencia = conn.createStatement();
-			ResultSet rs = sentencia.executeQuery("select r.*, c.descripcion as categoria from recetas r left join categorias c on r.id_categoria=c.id");
+			ResultSet rs = sentencia.executeQuery("SELECT r.*, c.descripcion AS categoria FROM recetas r LEFT JOIN categorias c ON r.id_categoria=c.id");
 			while (rs.next()) {
 				recetas.add(resultSetToListItem(rs));
 			}

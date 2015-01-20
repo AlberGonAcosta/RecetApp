@@ -45,7 +45,7 @@ public class CategoriasService implements ICategoriasService {
 	public void modificarCategoria(CategoriaItem categoria)throws ServiceException {
 		try{
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("UPDATE FROM categorias SET descripcion = ? WHERE id = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE categorias SET descripcion = ? WHERE id = ?");
 			statement.setString(1, categoria.getDescripcion());
 			statement.setLong(2, categoria.getId());
 			statement.executeUpdate();

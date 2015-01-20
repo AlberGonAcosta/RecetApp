@@ -44,7 +44,7 @@ public class MedidasService implements IMedidasService {
 	public void modificarMedida(MedidaItem medida) throws ServiceException {
 		try{
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("UPDATE FROM medidas SET nombre = ?, abreviatura = ? WHERE id = ?");
+			PreparedStatement statement = conn.prepareStatement("UPDATE medidas SET nombre = ?, abreviatura = ? WHERE id = ?");
 			statement.setString(1, medida.getNombre());
 			statement.setString(2, medida.getAbreviatura());
 			statement.setLong(3, medida.getId());

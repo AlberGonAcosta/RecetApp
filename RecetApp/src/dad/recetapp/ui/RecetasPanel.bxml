@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui:RecetasPanel bxml:id="anotacionesPanel" 
     xmlns:bxml="http://pivot.apache.org/bxml"
     xmlns:content="org.apache.pivot.wtk.content"
@@ -46,7 +46,7 @@
 									        
 		<TablePane.Row height="1*" >	
 			<ScrollPane horizontalScrollBarPolicy="fill_to_capacity">
-            <TableView bxml:id="tableView" styles="{includeTrailingVerticalGridLine:true}">
+            <TableView bxml:id="tableView" styles="{includeTrailingVerticalGridLine:true}" selectMode="MULTI">
                 <columns>
                     <TableView.Column name="nombre" width="1*" headerData="Nombre"/>
                     <TableView.Column name="para" width="1*" headerData="Para"/>
