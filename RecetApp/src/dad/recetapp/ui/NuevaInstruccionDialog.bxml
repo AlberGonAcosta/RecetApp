@@ -19,8 +19,8 @@
 		</rows>
 
 		<TablePane.Row height="-1">
-			<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-				<Label  text="Orden: "/>
+			<BoxPane styles="{horizontalAlignment:'right', verticalAlignment:'center'}">
+				<Label text="Orden:                "/>
 				<TextInput />
 			</BoxPane>
 		</TablePane.Row>

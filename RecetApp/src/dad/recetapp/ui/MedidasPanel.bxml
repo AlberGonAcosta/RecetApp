@@ -17,12 +17,12 @@
 
 		<TablePane.Row height="-1">
 			<BoxPane styles="{horizontalAlignment:'center',verticalAlignment:'center'}">
-				<Label  text="Nombre: "/>
-				<TextInput />
-				<Label  text="Abreviatura: "/>
-				<TextInput />
-				<PushButton buttonData="Añadir" />
-				<PushButton buttonData="Eliminar" />
+				<Label text="Nombre: "/>
+				<TextInput bxml:id="nombreText"/>
+				<Label text="Abreviatura: "/>
+				<TextInput bxml:id="abreviaturaText"/>
+				<PushButton bxml:id="anadirMedidaButton" buttonData="Añadir" />
+				<PushButton bxml:id="eliminarMedidaButton" buttonData="Eliminar" />
 			</BoxPane>
 		</TablePane.Row>
 			

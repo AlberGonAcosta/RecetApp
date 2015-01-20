@@ -50,8 +50,8 @@
                 <columns>
                     <TableView.Column name="nombre" width="1*" headerData="Nombre"/>
                     <TableView.Column name="para" width="1*" headerData="Para"/>
-                    <TableView.Column name="tiempo total" width="1*" headerData="Tiempo total"/>
-                    <TableView.Column name="fecha de creacion" width="1*" headerData="Fecha de creación"/>
+                    <TableView.Column name="tiempoTotal" width="1*" headerData="Tiempo total"/>
+                    <TableView.Column name="fechaCreacion" width="1*" headerData="Fecha de creación"/>
                     <TableView.Column name="categoria" width="1*" headerData="Categoría"/>
                 </columns>
             </TableView>
