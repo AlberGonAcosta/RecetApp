@@ -16,7 +16,6 @@ import org.apache.pivot.wtk.TextInput;
 
 import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.ServiceLocator;
-import dad.recetapp.services.items.TipoAnotacionItem;
 import dad.recetapp.services.items.TipoIngredienteItem;
 
 public class IngredientesPanel extends TablePane implements Bindable {

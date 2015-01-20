@@ -20,9 +20,16 @@ public class TiposIngredientesService implements ITiposIngredientesService {
 			if(tipo == null || tipo.getNombre() == null)
 				throw new ServiceException("Error al crear el tipo de ingrediente: El tipo no puede ser nulo.");
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("INSERT INTO tipos_ingredientes (nombre) VALUES (?)");
+			PreparedStatement statement = conn.prepareStatement("INSERT INTO tipos_ingredientes (nombre) VALUES (?)",PreparedStatement.RETURN_GENERATED_KEYS);
 			statement.setString(1,tipo.getNombre());
 			statement.executeUpdate();
+			ResultSet rs = statement.getGeneratedKeys();
+			Long id = null;
+			if (rs.next()) {
+				id = rs.getLong(1);
+				tipo.setId(id);
+			}
+			rs.close();
 			statement.close();
 		} catch (SQLException e) {
 			throw new ServiceException("Error al crear el tipo de ingrediente '"+tipo.getNombre()+"': "+ e.getMessage());

@@ -5,23 +5,17 @@ import java.util.List;
 
 import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.Bindable;
-import org.apache.pivot.collections.ArrayList;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.collections.Sequence;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
-import org.apache.pivot.wtk.MessageType;
-import org.apache.pivot.wtk.Prompt;
-import org.apache.pivot.wtk.Sheet;
-import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.TablePane;
 import org.apache.pivot.wtk.TableView;
 import org.apache.pivot.wtk.TextInput;
 
 import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.ServiceLocator;
-import dad.recetapp.services.items.AnotacionItem;
 import dad.recetapp.services.items.TipoAnotacionItem;
 
 public class AnotacionesPanel extends TablePane implements Bindable {
@@ -67,7 +61,6 @@ public class AnotacionesPanel extends TablePane implements Bindable {
 
 	protected void onAnadirAnotacionButtonActionPerformed() {
 		TipoAnotacionItem nuevaAnotacion = new TipoAnotacionItem();
-		nuevaAnotacion.setId(1l);
 		nuevaAnotacion.setDescripcion(nombreText.getText());
 		variables.add(nuevaAnotacion);
 		try {

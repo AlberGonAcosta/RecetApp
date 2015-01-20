@@ -21,10 +21,17 @@ public class MedidasService implements IMedidasService {
 				throw new ServiceException("Error al crear la medida: La medida no puede ser nula.");
 			}
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement statement = conn.prepareStatement("INSERT INTO medidas (nombre, abreviatura) VALUES (?,?)");
+			PreparedStatement statement = conn.prepareStatement("INSERT INTO medidas (nombre, abreviatura) VALUES (?,?)",PreparedStatement.RETURN_GENERATED_KEYS);
 			statement.setString(1, medida.getNombre());
 			statement.setString(2, medida.getAbreviatura());
 			statement.executeUpdate();
+			ResultSet rs = statement.getGeneratedKeys();
+			Long id = null;
+			if (rs.next()) {
+				id = rs.getLong(1);
+				medida.setId(id);
+			}
+			rs.close();
 			statement.close();
 		} catch (SQLException e){
 			throw new ServiceException("Error al crear la medida '"+medida.getNombre()+"': "+ e.getMessage());
