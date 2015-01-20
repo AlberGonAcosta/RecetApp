@@ -34,7 +34,7 @@
                     </Spinner>
 				<Label  text=" S "/>
 				<Label  text="Categoría: "/>
-				<ListButton listData="['&lt;Categorías&gt;']" selectedIndex="0" />
+				<ListButton bxml:id="categoriasListButton"/>
 			</BoxPane>
 		</TablePane.Row>
 			
@@ -63,15 +63,15 @@
 		
 		<TablePane.Row height="-1">		       		
 			<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-				<Label  text=""/>
+				<Label text=""/>
 			</BoxPane>		       			 					        
 		</TablePane.Row>
 		
 		<TablePane.Row height="-1" >
 			<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-	            <PushButton buttonData="Anadir" />
-				<PushButton buttonData="Eliminar" />
-				<PushButton buttonData="Editar" />
+	            <PushButton bxml:id="anadirRecetaButton" buttonData="Anadir" />
+				<PushButton bxml:id="eliminarRecetaButton" buttonData="Eliminar" />
+				<PushButton bxml:id="editarRecetaButton" buttonData="Editar" />
 	        </BoxPane>
 		</TablePane.Row>
 
