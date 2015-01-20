@@ -17,13 +17,17 @@ public class RecetappFrame extends Window implements Bindable {
 	@BXML
 	private Window recetappFrame;
 	@BXML
-    private Label numRecetasPane;
+    private static Label numRecetasPane;
 
 	
     @Override
     public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
     	recetappFrame.setIcon("/dad/recetapp/ui/images/logo.png");
+    	setNumReceta();
     	
+    }
+    
+    public static void setNumReceta(){
     	try {
 			numRecetasPane.setText(String.valueOf(ServiceLocator.getRecetasService().listarRecetas().size()));
 		} catch (ServiceException e) {

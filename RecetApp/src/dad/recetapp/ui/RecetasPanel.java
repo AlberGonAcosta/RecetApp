@@ -115,6 +115,7 @@ public class RecetasPanel extends TablePane implements Bindable {
 							RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
 							variables.remove(recetaSeleccionada);
 							ServiceLocator.getRecetasService().eliminarReceta(recetaSeleccionada.getId());
+							RecetappFrame.setNumReceta();
 						} catch (ServiceException e) {
 							e.printStackTrace();
 						}
