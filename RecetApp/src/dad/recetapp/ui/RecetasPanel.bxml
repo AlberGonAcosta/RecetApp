@@ -29,7 +29,7 @@
 				<Label  text=" M "/>
 				<Spinner preferredWidth="40" selectedIndex="0">
                         <spinnerData>
-                            <content:NumericSpinnerData lowerBound="0" upperBound="9" increment="1"/>
+                            <content:NumericSpinnerData lowerBound="0" increment="1"/>
                         </spinnerData>
                     </Spinner>
 				<Label  text=" S "/>

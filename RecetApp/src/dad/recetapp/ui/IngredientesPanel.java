@@ -52,7 +52,7 @@ public class IngredientesPanel extends TablePane implements Bindable {
 			variables.add(l);
 		}
 		tableView.setTableData(variables);
-		
+
 		anadirIngredienteButton.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
 			public void buttonPressed(Button button) {
@@ -66,61 +66,75 @@ public class IngredientesPanel extends TablePane implements Bindable {
 				onEliminarIngredienteButtonActionPerformed();
 			}
 		});
-		
+
 		tableView.getTableViewRowListeners().add(new TableViewRowListener.Adapter(){
 			@Override
-				public void rowUpdated(TableView tableView, int row) {
-					onRowUpdated();
-					super.rowUpdated(tableView, row);
-				}	
-			});
+			public void rowUpdated(TableView tableView, int row) {
+				onRowUpdated();
+				super.rowUpdated(tableView, row);
+			}	
+		});
 	}
 
 
 	protected void onAnadirIngredienteButtonActionPerformed() {
-		TipoIngredienteItem nuevoTipoIngrediente = new TipoIngredienteItem();
-		nuevoTipoIngrediente.setId(1l);
-		nuevoTipoIngrediente.setNombre(nombreText.getText());
-		variables.add(nuevoTipoIngrediente);
-		try {
-			ServiceLocator.getTiposIngredientesService().crearTipoIngrediente(nuevoTipoIngrediente);
-		} catch (ServiceException e) {
-			e.printStackTrace();
+		if(nombreText.getText().equals("")){
+			Prompt error = new Prompt(MessageType.ERROR, "El nombre del ingrediente no puede estar vacío", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			TipoIngredienteItem nuevoTipoIngrediente = new TipoIngredienteItem();
+			nuevoTipoIngrediente.setId(1l);
+			nuevoTipoIngrediente.setNombre(nombreText.getText());
+			variables.add(nuevoTipoIngrediente);
+			try {
+				ServiceLocator.getTiposIngredientesService().crearTipoIngrediente(nuevoTipoIngrediente);
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+			nombreText.setText("");
 		}
-		nombreText.setText("");
 	}
 
 
 	protected void onEliminarIngredienteButtonActionPerformed() {
-		StringBuffer mensaje = new StringBuffer();
-		mensaje.append("¿Desea eliminar los siguientes tipos de ingrediente?\n\n");
-		
 		Sequence<?> seleccionados = tableView.getSelectedRows();
-		for (int i = 0; i < seleccionados.getLength(); i++) {
-			TipoAnotacionItem tipoIngredienteSeleccionado = (TipoAnotacionItem) seleccionados.get(i);
-			mensaje.append(" - " + tipoIngredienteSeleccionado.getDescripcion() + "\n");
-		}
-		
-		Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
-		confirmar.open(this.getWindow(), new SheetCloseListener() {
-			public void sheetClosed(Sheet sheet) {
-				
-				if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
-					Sequence<?> seleccionados = tableView.getSelectedRows();
-					for (int i = 0; i < seleccionados.getLength(); i++) {
-						TipoIngredienteItem tipoIngredienteSeleccionado = (TipoIngredienteItem) seleccionados.get(i);
-						variables.remove(tipoIngredienteSeleccionado);
-						try {
-							ServiceLocator.getTiposIngredientesService().eliminarTipoIngrediente(tipoIngredienteSeleccionado.getId());
-						} catch (ServiceException e) {
-							e.printStackTrace();
-						}
-					}
-				}			
+		if(seleccionados.getLength() == 0){
+			Prompt error = new Prompt(MessageType.ERROR, "Debe selecionar un tipo de ingrediente", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			StringBuffer mensaje = new StringBuffer();
+			mensaje.append("¿Desea eliminar los siguientes tipos de ingrediente?\n\n");
+
+			for (int i = 0; i < seleccionados.getLength(); i++) {
+				TipoAnotacionItem tipoIngredienteSeleccionado = (TipoAnotacionItem) seleccionados.get(i);
+				mensaje.append(" - " + tipoIngredienteSeleccionado.getDescripcion() + "\n");
 			}
-		});
+
+			Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
+			confirmar.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {
+
+					if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
+						Sequence<?> seleccionados = tableView.getSelectedRows();
+						for (int i = 0; i < seleccionados.getLength(); i++) {
+							TipoIngredienteItem tipoIngredienteSeleccionado = (TipoIngredienteItem) seleccionados.get(i);
+							variables.remove(tipoIngredienteSeleccionado);
+							try {
+								ServiceLocator.getTiposIngredientesService().eliminarTipoIngrediente(tipoIngredienteSeleccionado.getId());
+							} catch (ServiceException e) {
+								e.printStackTrace();
+							}
+						}
+					}			
+				}
+			});
+		}
 	}
-	
+
 	protected void onRowUpdated() {
 		TipoIngredienteItem seleccionado = (TipoIngredienteItem) tableView.getSelectedRow();
 		try {

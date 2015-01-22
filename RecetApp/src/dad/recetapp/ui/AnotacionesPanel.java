@@ -64,7 +64,7 @@ public class AnotacionesPanel extends TablePane implements Bindable {
 			}
 		});
 		tableView.getTableViewRowListeners().add(new TableViewRowListener.Adapter(){
-		@Override
+			@Override
 			public void rowUpdated(TableView tableView, int row) {
 				onRowUpdated();
 				super.rowUpdated(tableView, row);
@@ -73,45 +73,59 @@ public class AnotacionesPanel extends TablePane implements Bindable {
 	}
 
 	protected void onAnadirAnotacionButtonActionPerformed() {
-		TipoAnotacionItem nuevaAnotacion = new TipoAnotacionItem();
-		nuevaAnotacion.setDescripcion(nombreText.getText());
-		variables.add(nuevaAnotacion);
-		try {
-			ServiceLocator.getTiposAnotacionesService().crearTipoAnotacion(nuevaAnotacion);
-		} catch (ServiceException e) {
-			e.printStackTrace();
+		if(nombreText.getText().equals("")){
+			Prompt error = new Prompt(MessageType.ERROR, "La anotación no puede estar vacía", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			TipoAnotacionItem nuevaAnotacion = new TipoAnotacionItem();
+			nuevaAnotacion.setDescripcion(nombreText.getText());
+			variables.add(nuevaAnotacion);
+			try {
+				ServiceLocator.getTiposAnotacionesService().crearTipoAnotacion(nuevaAnotacion);
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+			nombreText.setText("");
 		}
-		nombreText.setText("");
 	}
 
 	protected void onEliminarAnotacionButtonActionPerformed() {	
-		StringBuffer mensaje = new StringBuffer();
-		mensaje.append("¿Desea eliminar las siguientes anotaciones?\n\n");
-		
 		Sequence<?> seleccionados = tableView.getSelectedRows();
-		for (int i = 0; i < seleccionados.getLength(); i++) {
-			TipoAnotacionItem anotacionSeleccionada = (TipoAnotacionItem) seleccionados.get(i);
-			mensaje.append(" - " + anotacionSeleccionada.getDescripcion() + "\n");
-		}
-		
-		Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
-		confirmar.open(this.getWindow(), new SheetCloseListener() {
-			public void sheetClosed(Sheet sheet) {
-				
-				if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
-					Sequence<?> seleccionados = tableView.getSelectedRows();
-					for (int i = 0; i < seleccionados.getLength(); i++) {
-						try {
-							TipoAnotacionItem anotacionSeleccionada = (TipoAnotacionItem) seleccionados.get(i);
-							variables.remove(anotacionSeleccionada);
-							ServiceLocator.getTiposAnotacionesService().eliminarTipoAnotacion(anotacionSeleccionada.getId());
-						} catch (ServiceException e) {
-							e.printStackTrace();
-						}
-					}	
-				}			
+		if(seleccionados.getLength() == 0){
+			Prompt error = new Prompt(MessageType.ERROR, "Debe selecionar una anotación", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			StringBuffer mensaje = new StringBuffer();
+			mensaje.append("¿Desea eliminar las siguientes anotaciones?\n\n");
+
+			for (int i = 0; i < seleccionados.getLength(); i++) {
+				TipoAnotacionItem anotacionSeleccionada = (TipoAnotacionItem) seleccionados.get(i);
+				mensaje.append(" - " + anotacionSeleccionada.getDescripcion() + "\n");
 			}
-		});
+
+			Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
+			confirmar.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {
+
+					if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
+						Sequence<?> seleccionados = tableView.getSelectedRows();
+						for (int i = 0; i < seleccionados.getLength(); i++) {
+							try {
+								TipoAnotacionItem anotacionSeleccionada = (TipoAnotacionItem) seleccionados.get(i);
+								variables.remove(anotacionSeleccionada);
+								ServiceLocator.getTiposAnotacionesService().eliminarTipoAnotacion(anotacionSeleccionada.getId());
+							} catch (ServiceException e) {
+								e.printStackTrace();
+							}
+						}	
+					}			
+				}
+			});
+		}
 	}
 
 	protected void onRowUpdated() {

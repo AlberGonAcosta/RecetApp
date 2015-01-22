@@ -22,7 +22,7 @@ import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.ServiceLocator;
 import dad.recetapp.services.items.CategoriaItem;
 import dad.recetapp.services.items.RecetaListItem;
- 
+
 public class RecetasPanel extends TablePane implements Bindable {
 
 	@BXML
@@ -30,9 +30,8 @@ public class RecetasPanel extends TablePane implements Bindable {
 	private org.apache.pivot.collections.List<RecetaListItem> variables;
 	private org.apache.pivot.collections.List<RecetaListItem> lista;
 	@BXML
-	private ListButton categoriasListButton;
-	private org.apache.pivot.collections.List<CategoriaItem> categoriasBD;
-	private org.apache.pivot.collections.List<CategoriaItem> categoriasCombo;
+	private static ListButton categoriasListButton;
+	private static org.apache.pivot.collections.List<CategoriaItem> categoriasBD;
 	@BXML
 	private Button anadirRecetaButton;
 	@BXML
@@ -40,10 +39,10 @@ public class RecetasPanel extends TablePane implements Bindable {
 	@BXML
 	private Button editarRecetaButton;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
-    public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
-    	variables = new org.apache.pivot.collections.ArrayList<RecetaListItem>();
+	public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
+		variables = new org.apache.pivot.collections.ArrayList<RecetaListItem>();
 
 		try {
 			lista = convertirList(ServiceLocator.getRecetasService().listarRecetas());
@@ -54,84 +53,92 @@ public class RecetasPanel extends TablePane implements Bindable {
 			variables.add(l);
 		}
 		tableView.setTableData(variables);
-		
+
 		try {
-			categoriasBD = convertirList(ServiceLocator.getCategoriasService().listarCategorias());
-			CategoriaItem categoriaTitle = new CategoriaItem();
-			categoriaTitle.setId(null);
-			categoriaTitle.setDescripcion("<Categorías>");
-			categoriasCombo = new ArrayList();
-			categoriasCombo.add(categoriaTitle);
-			for(int i = 0; i<categoriasBD.getLength(); i++){
-				categoriasCombo.add(categoriasBD.get(i));
-			}
-			categoriasListButton.setListData(categoriasCombo);
-			categoriasListButton.setSelectedItem(categoriaTitle);
+			recargarCategoriaListButton();
 
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
-		
-//		anadirRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
-//			@Override
-//			public void buttonPressed(Button button) {
-//				onAnadirRecetaButtonActionPerformed();
-//			}
-//		});
-		
+
+		//		anadirRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
+		//			@Override
+		//			public void buttonPressed(Button button) {
+		//				onAnadirRecetaButtonActionPerformed();
+		//			}
+		//		});
+
 		eliminarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
 			public void buttonPressed(Button button) {
 				onEliminarRecetaButtonActionPerformed();
 			}
 		});
-//		
-//		editarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
-//			@Override
-//			public void buttonPressed(Button button) {
-//				onEditarRecetaButtonActionPerformed();
-//			}
-//		});
-    }
+		//		
+		//		editarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
+		//			@Override
+		//			public void buttonPressed(Button button) {
+		//				onEditarRecetaButtonActionPerformed();
+		//			}
+		//		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void recargarCategoriaListButton() throws ServiceException {
+		CategoriaItem categoriaTitle = new CategoriaItem();
+		categoriaTitle.setId(null);
+		categoriaTitle.setDescripcion("<Categorías>");
+		categoriasBD = convertirList(ServiceLocator.getCategoriasService().listarCategorias());
+		categoriasBD.insert(categoriaTitle, 0);
+		categoriasListButton.setListData(categoriasBD);
+		categoriasListButton.setSelectedItem(categoriaTitle);
+	}
 
 	protected void onEliminarRecetaButtonActionPerformed() {
-		StringBuffer mensaje = new StringBuffer();
-		mensaje.append("¿Desea eliminar las siguientes recetas?\n\n");
-		
 		Sequence<?> seleccionados = tableView.getSelectedRows();
-		for (int i = 0; i < seleccionados.getLength(); i++) {
-			RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
-			mensaje.append(" - " + recetaSeleccionada.getNombre() + "\n");
-		}
-		
-		Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
-		confirmar.open(this.getWindow(), new SheetCloseListener() {
-			public void sheetClosed(Sheet sheet) {
-				
-				if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
-					Sequence<?> seleccionados = tableView.getSelectedRows();
-					for (int i = 0; i < seleccionados.getLength(); i++) {
-						try {
-							RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
-							variables.remove(recetaSeleccionada);
-							ServiceLocator.getRecetasService().eliminarReceta(recetaSeleccionada.getId());
-							RecetappFrame.setNumReceta();
-						} catch (ServiceException e) {
-							e.printStackTrace();
-						}
-					}	
-				}			
+		if(seleccionados.getLength() == 0){
+			Prompt error = new Prompt(MessageType.ERROR, "Debe selecionar una receta", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			StringBuffer mensaje = new StringBuffer();
+			mensaje.append("¿Desea eliminar las siguientes recetas?\n\n");
+
+			for (int i = 0; i < seleccionados.getLength(); i++) {
+				RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
+				mensaje.append(" - " + recetaSeleccionada.getNombre() + "\n");
 			}
-		});
+
+			Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
+			confirmar.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {
+
+					if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
+						Sequence<?> seleccionados = tableView.getSelectedRows();
+						for (int i = 0; i < seleccionados.getLength(); i++) {
+							try {
+								RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
+								variables.remove(recetaSeleccionada);
+								ServiceLocator.getRecetasService().eliminarReceta(recetaSeleccionada.getId());
+								RecetappFrame.setNumReceta();
+							} catch (ServiceException e) {
+								e.printStackTrace();
+							}
+						}	
+					}			
+				}
+			});
+		}
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected org.apache.pivot.collections.List convertirList(java.util.List<?> listaUtil){
+	protected static org.apache.pivot.collections.List convertirList(java.util.List<?> listaUtil){
 		org.apache.pivot.collections.List listaApache = new org.apache.pivot.collections.ArrayList();
 		for(int i = 0; i<listaUtil.size(); i++){
 			listaApache.add(listaUtil.get(i));
 		}
 		return listaApache;
 	}
- 
+
 }

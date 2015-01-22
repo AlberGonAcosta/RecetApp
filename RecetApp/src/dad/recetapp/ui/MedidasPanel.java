@@ -23,8 +23,7 @@ import org.apache.pivot.wtk.TextInput;
 import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.ServiceLocator;
 import dad.recetapp.services.items.MedidaItem;
-import dad.recetapp.services.items.TipoAnotacionItem;
- 
+
 public class MedidasPanel extends TablePane implements Bindable {
 
 	@BXML
@@ -40,9 +39,9 @@ public class MedidasPanel extends TablePane implements Bindable {
 	@BXML
 	private TextInput abreviaturaText;
 
-    @Override
-    public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
-    	variables = new org.apache.pivot.collections.ArrayList<MedidaItem>();
+	@Override
+	public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
+		variables = new org.apache.pivot.collections.ArrayList<MedidaItem>();
 
 		try {
 			lista = ServiceLocator.getMedidasService().listarMedidas();
@@ -53,7 +52,7 @@ public class MedidasPanel extends TablePane implements Bindable {
 			variables.add(l);
 		}
 		tableView.setTableData(variables);
-		
+
 		anadirMedidaButton.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
 			public void buttonPressed(Button button) {
@@ -66,61 +65,76 @@ public class MedidasPanel extends TablePane implements Bindable {
 				onEliminarMedidaButtonActionPerformed();
 			}
 		});
-		
+
 		tableView.getTableViewRowListeners().add(new TableViewRowListener.Adapter(){
 			@Override
-				public void rowUpdated(TableView tableView, int row) {
-					onRowUpdated();
-					super.rowUpdated(tableView, row);
-				}	
-			});
-    }
+			public void rowUpdated(TableView tableView, int row) {
+				onRowUpdated();
+				super.rowUpdated(tableView, row);
+			}	
+		});
+	}
 
 	protected void onAnadirMedidaButtonActionPerformed() {
-		MedidaItem nuevaMedida = new MedidaItem();
-		nuevaMedida.setId(1l);
-		nuevaMedida.setNombre(nombreText.getText());
-		nuevaMedida.setAbreviatura(abreviaturaText.getText());
-		variables.add(nuevaMedida);
-		try {
-			ServiceLocator.getMedidasService().crearMedida(nuevaMedida);
-		} catch (ServiceException e) {
-			e.printStackTrace();
+		if(nombreText.getText().equals("")){
+			Prompt error = new Prompt(MessageType.ERROR, "El nombre de la medida no puede estar vacío", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			MedidaItem nuevaMedida = new MedidaItem();
+			nuevaMedida.setId(1l);
+			nuevaMedida.setNombre(nombreText.getText());
+			nuevaMedida.setAbreviatura(abreviaturaText.getText());
+			variables.add(nuevaMedida);
+			try {
+				ServiceLocator.getMedidasService().crearMedida(nuevaMedida);
+			} catch (ServiceException e) {
+				e.printStackTrace();
+			}
+			nombreText.setText("");
+			abreviaturaText.setText("");
 		}
-		nombreText.setText("");
-		abreviaturaText.setText("");
 	}
 
 	protected void onEliminarMedidaButtonActionPerformed() {
-		StringBuffer mensaje = new StringBuffer();
-		mensaje.append("¿Desea eliminar las siguientes medidas?\n\n");
-		
 		Sequence<?> seleccionados = tableView.getSelectedRows();
-		for (int i = 0; i < seleccionados.getLength(); i++) {
-			TipoAnotacionItem medidaSeleccionada = (TipoAnotacionItem) seleccionados.get(i);
-			mensaje.append(" - " + medidaSeleccionada.getDescripcion() + "\n");
-		}
-		
-		Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
-		confirmar.open(this.getWindow(), new SheetCloseListener() {
-			public void sheetClosed(Sheet sheet) {
-				
-				if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
-					Sequence<?> seleccionados = tableView.getSelectedRows();
-					for (int i = 0; i < seleccionados.getLength(); i++) {
-						MedidaItem medidaSeleccionada = (MedidaItem) seleccionados.get(i);
-						variables.remove(medidaSeleccionada);
-						try {
-							ServiceLocator.getMedidasService().eliminarMedida(medidaSeleccionada.getId());
-						} catch (ServiceException e) {
-							e.printStackTrace();
-						}
-					}
-				}			
+		if(seleccionados.getLength() == 0){
+			Prompt error = new Prompt(MessageType.ERROR, "Debe selecionar una medida", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+
+			StringBuffer mensaje = new StringBuffer();
+			mensaje.append("¿Desea eliminar las siguientes medidas?\n\n");
+
+			for (int i = 0; i < seleccionados.getLength(); i++) {
+				MedidaItem medidaSeleccionada = (MedidaItem) seleccionados.get(i);
+				mensaje.append(" - " + medidaSeleccionada.getNombre() + "\n");
 			}
-		});
+
+			Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
+			confirmar.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {
+
+					if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
+						Sequence<?> seleccionados = tableView.getSelectedRows();
+						for (int i = 0; i < seleccionados.getLength(); i++) {
+							MedidaItem medidaSeleccionada = (MedidaItem) seleccionados.get(i);
+							variables.remove(medidaSeleccionada);
+							try {
+								ServiceLocator.getMedidasService().eliminarMedida(medidaSeleccionada.getId());
+							} catch (ServiceException e) {
+								e.printStackTrace();
+							}
+						}
+					}			
+				}
+			});
+		}
 	}
-	
+
 	protected void onRowUpdated() {
 		MedidaItem seleccionado = (MedidaItem) tableView.getSelectedRow();
 		try {
