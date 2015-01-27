@@ -9,17 +9,19 @@ import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
 import org.apache.pivot.wtk.Dialog;
+import org.apache.pivot.wtk.ListButton;
  
 public class NuevoIngredienteDialog extends Dialog implements Bindable {
 
 	@BXML
-	private NuevoIngredienteDialog nuevoIngredienteDialog;
-	@BXML
 	private Button anadirIngredienteButton, cancelarIngredienteButton;
+	@BXML
+	private ListButton medidasListButton, tipoListButton; 
 	
     @Override
     public void initialize(Map<String, Object> namespace, URL location, Resources resources) {
     	
+    	NuevoIngredienteDialog nuevoIngredienteDialog = null;
     	nuevoIngredienteDialog.setTitle("Nuevo ingrediente");
 
     	cancelarIngredienteButton.getButtonPressListeners().add(new ButtonPressListener() {

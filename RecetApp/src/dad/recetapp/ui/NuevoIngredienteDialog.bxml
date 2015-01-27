@@ -38,7 +38,8 @@
 		<TablePane.Row height="-1">
 			<BoxPane styles="{horizontalAlignment:'left', verticalAlignment:'center'}">
 				<Label  text="Medida: " />
-				<Label  text="          " /><ListButton listData="[' Seleccione la medida ', 'medida1','medida2']" selectedIndex="0" />
+				<Label  text="          " />
+				<ListButton bxml:id="medidasListButton"/>
 			</BoxPane>
 		</TablePane.Row>
 		
@@ -51,7 +52,8 @@
 		<TablePane.Row height="-1">
 			<BoxPane styles="{horizontalAlignment:'left', verticalAlignment:'center'}">
 				<Label  text="Tipo: " />
-				<Label  text="                   " /><ListButton listData="[' Seleccione el tipo ', 'tipo1','tipo2']" selectedIndex="0" />
+				<Label  text="                   " />
+				<ListButton bxml:id="tipoListButton"/>
 			</BoxPane>
 		</TablePane.Row>
 		
@@ -69,7 +71,7 @@
 		
 		<TablePane.Row height="-1">
 			<BoxPane styles="{horizontalAlignment:'right', verticalAlignment:'center'}">
-				<PushButton buttonData="Añadir" bxml:id="anadirIngredienteButton"/>
+				<PushButton buttonData="AÃ±adir" bxml:id="anadirIngredienteButton"/>
 				<PushButton buttonData="Cancelar" bxml:id="cancelarIngredienteButton"/>
 			</BoxPane>
 		</TablePane.Row>

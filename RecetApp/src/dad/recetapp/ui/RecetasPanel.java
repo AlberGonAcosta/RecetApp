@@ -1,5 +1,6 @@
 package dad.recetapp.ui;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.pivot.beans.BXML;
@@ -7,6 +8,7 @@ import org.apache.pivot.beans.Bindable;
 import org.apache.pivot.collections.ArrayList;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.collections.Sequence;
+import org.apache.pivot.serialization.SerializationException;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
@@ -18,6 +20,7 @@ import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.TablePane;
 import org.apache.pivot.wtk.TableView;
 
+import dad.recetapp.RecetappApplication;
 import dad.recetapp.services.ServiceException;
 import dad.recetapp.services.ServiceLocator;
 import dad.recetapp.services.items.CategoriaItem;
@@ -61,12 +64,12 @@ public class RecetasPanel extends TablePane implements Bindable {
 			e.printStackTrace();
 		}
 
-		//		anadirRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
-		//			@Override
-		//			public void buttonPressed(Button button) {
-		//				onAnadirRecetaButtonActionPerformed();
-		//			}
-		//		});
+		anadirRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				onAnadirRecetaButtonActionPerformed();
+			}
+		});
 
 		eliminarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
@@ -74,13 +77,48 @@ public class RecetasPanel extends TablePane implements Bindable {
 				onEliminarRecetaButtonActionPerformed();
 			}
 		});
-		//		
-		//		editarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
-		//			@Override
-		//			public void buttonPressed(Button button) {
-		//				onEditarRecetaButtonActionPerformed();
-		//			}
-		//		});
+
+		editarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				onEditarRecetaButtonActionPerformed();
+			}
+		});
+	}
+
+	protected void onEditarRecetaButtonActionPerformed() {
+		Sequence<?> seleccionados = tableView.getSelectedRows();
+		if(seleccionados.getLength() == 0){
+			Prompt error = new Prompt(MessageType.ERROR, "Debe selecionar una receta", new ArrayList<String>("OK"));
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {}
+			});
+		} else {
+			EditarRecetaWindow editarRecetaWindow = null;
+			try {
+				editarRecetaWindow = (EditarRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/EditarRecetaWindow.bxml");
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SerializationException e) {
+				e.printStackTrace();
+			}
+			editarRecetaWindow.open(getDisplay());
+		}
+
+	}
+
+	protected void onAnadirRecetaButtonActionPerformed() {
+		NuevaRecetaWindow nuevaRecetaWindow = null;
+
+		try {
+			nuevaRecetaWindow = (NuevaRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/NuevaRecetaWindow.bxml");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SerializationException e) {
+			e.printStackTrace();
+		}
+		nuevaRecetaWindow.open(getDisplay());
+
 	}
 
 	@SuppressWarnings("unchecked")
