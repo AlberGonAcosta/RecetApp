@@ -1,10 +1,6 @@
 package dad.recetapp.ui;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import javafx.scene.control.Tab;
 
 import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.Bindable;
