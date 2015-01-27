@@ -70,7 +70,7 @@
 		
 		<TablePane.Row height="-1" >
 			<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-	            <PushButton bxml:id="anadirRecetaButton" buttonData="Anadir" />
+	            <PushButton bxml:id="anadirRecetaButton" buttonData="Añadir" />
 				<PushButton bxml:id="eliminarRecetaButton" buttonData="Eliminar" />
 				<PushButton bxml:id="editarRecetaButton" buttonData="Editar" />
 	        </BoxPane>
