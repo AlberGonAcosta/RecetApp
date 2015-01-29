@@ -33,4 +33,11 @@ public class SeccionItem {
 	public void setIngredientes(List<IngredienteItem> ingredientes) {
 		this.ingredientes = ingredientes;
 	}
+	public boolean equals(Object obj){
+		if(obj instanceof SeccionItem){
+			SeccionItem tipo = (SeccionItem) obj;
+			return tipo.getId() == this.id;
+		}
+		return false;
+	}
 }

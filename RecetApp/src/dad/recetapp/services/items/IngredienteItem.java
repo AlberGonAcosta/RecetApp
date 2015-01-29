@@ -30,5 +30,12 @@ public class IngredienteItem {
 	}
 	public void setMedida(MedidaItem medida) {
 		this.medida = medida;
-	}	
+	}
+	public boolean equals(Object obj){
+		if(obj instanceof IngredienteItem){
+			IngredienteItem tipo = (IngredienteItem) obj;
+			return tipo.getId() == this.id;
+		}
+		return false;
+	}
 }

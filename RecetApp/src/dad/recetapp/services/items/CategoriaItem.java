@@ -20,4 +20,11 @@ public class CategoriaItem {
 	public String toString(){
 		return descripcion;
 	}
+	public boolean equals(Object obj){
+		if(obj instanceof CategoriaItem){
+			CategoriaItem tipo = (CategoriaItem) obj;
+			return tipo.getId() == this.id;
+		}
+		return false;
+	}
 }

@@ -24,4 +24,11 @@ public class AnotacionItem {
 	public void setTipo(TipoAnotacionItem tipo) {
 		this.tipo = tipo;
 	}
+	public boolean equals(Object obj){
+		if(obj instanceof AnotacionItem){
+			AnotacionItem tipo = (AnotacionItem) obj;
+			return tipo.getId() == this.id;
+		}
+		return false;
+	}
 }
