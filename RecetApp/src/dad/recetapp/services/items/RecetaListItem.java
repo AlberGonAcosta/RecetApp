@@ -1,5 +1,6 @@
 package dad.recetapp.services.items;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class RecetaListItem {
@@ -75,7 +76,7 @@ public class RecetaListItem {
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof RecetaListItem) {
@@ -84,10 +85,41 @@ public class RecetaListItem {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		return nombre;
 	}
 
+	public String getCantidadPara() {
+		return cantidad + " " + para;
+	}
+
+	public String getTiempoFormateado() {
+		int segundos, minutos;
+
+		minutos = tiempoTotal / 60;
+		segundos = tiempoTotal % 60;
+
+		if (minutos == 0 && segundos == 0) {
+			return "Desconocido";
+		} else if (minutos != 0 && segundos == 0) {
+			return minutos + "M";
+		} else if (minutos == 0 && segundos != 0) {
+			return segundos + "S";
+		}
+
+		return minutos + "M " + segundos + "S ";
+	}
+
+	public String getFechaFormateada() {
+		Calendar calendario = Calendar.getInstance();
+		calendario.setTime(fechaCreacion);
+
+		String fechaFormateada = "" + calendario.get(Calendar.DAY_OF_MONTH)
+				+ "/" + (calendario.get(Calendar.MONTH) + 1) + "/"
+				+ calendario.get(Calendar.YEAR);
+
+		return fechaFormateada;
+	}
 }

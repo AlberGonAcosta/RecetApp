@@ -24,6 +24,9 @@ public class MedidaItem {
 	public void setAbreviatura(String abreviatura) {
 		this.abreviatura = abreviatura;
 	}
+	public String toString(){
+		return nombre;
+	}
 	public boolean equals(Object obj){
 		if(obj instanceof MedidaItem){
 			MedidaItem tipo = (MedidaItem) obj;

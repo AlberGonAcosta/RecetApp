@@ -12,6 +12,7 @@ import java.util.List;
 import dad.recetapp.db.BaseDatos;
 import dad.recetapp.services.IRecetasService;
 import dad.recetapp.services.ServiceException;
+import dad.recetapp.services.ServiceLocator;
 import dad.recetapp.services.items.AnotacionItem;
 import dad.recetapp.services.items.CategoriaItem;
 import dad.recetapp.services.items.IngredienteItem;
@@ -24,16 +25,17 @@ import dad.recetapp.services.items.TipoAnotacionItem;
 import dad.recetapp.services.items.TipoIngredienteItem;
 
 public class RecetasService implements IRecetasService {
-
-	public void crearReceta(RecetaItem receta) throws ServiceException {
+	
+	public Long crearReceta(RecetaItem receta) throws ServiceException {
 		Connection conn = null;
+		Long id = null;
 		try {
 			conn = BaseDatos.getConnection();
 			conn.setAutoCommit(false);
-
+			
 			receta.setFechaCreacion(new Date()); 
-
-			PreparedStatement sentencia = conn.prepareStatement("INSERT INTO recetas (nombre, fecha_creacion, cantidad, para, tiempo_total, tiempo_thermomix, id_categoria) VALUES (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+			
+			PreparedStatement sentencia = conn.prepareStatement("insert into recetas (nombre, fecha_creacion, cantidad, para, tiempo_total, tiempo_thermomix, id_categoria) values (?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			sentencia.setString(1, receta.getNombre());
 			sentencia.setDate(2, new java.sql.Date(receta.getFechaCreacion().getTime()));
 			sentencia.setInt(3, receta.getCantidad());
@@ -42,26 +44,29 @@ public class RecetasService implements IRecetasService {
 			sentencia.setInt(6, receta.getTiempoThermomix());
 			sentencia.setLong(7, receta.getCategoria().getId());
 			sentencia.executeUpdate();
-			ResultSet rs = sentencia.getGeneratedKeys();
-			Long id = null;
-			if (rs.next()) {
-				id = rs.getLong(1);
-			}
-			rs.close();
+	        ResultSet rs = sentencia.getGeneratedKeys();
+	        
+	        if (rs.next()) {
+	            id = rs.getLong(1);
+	        }
+	        rs.close();
 			sentencia.close();
-
+			
 			// crear las anotaciones
 			for (AnotacionItem anotacion : receta.getAnotaciones()) {
 				crearAnotacion(id, anotacion);
 			}
-
+			
 			// crear las secciones
 			for (SeccionItem seccion : receta.getSecciones()) {
 				crearSeccion(id, seccion);
 			}
-
+			
 			conn.commit();
 			conn.setAutoCommit(true);
+			
+			receta.setId(id);
+			
 		} catch (SQLException e) {
 			try {
 				conn.rollback();
@@ -71,6 +76,7 @@ public class RecetasService implements IRecetasService {
 			}
 			throw new ServiceException("Error al crear la receta '" + receta.getNombre() + "': " + e.getMessage());
 		}
+		return id;
 	}
 
 
@@ -79,10 +85,10 @@ public class RecetasService implements IRecetasService {
 		try {
 			conn = BaseDatos.getConnection();
 			conn.setAutoCommit(false);
-
+			
 			RecetaItem recetaActual = obtenerReceta(receta.getId());
-
-			PreparedStatement sentencia = conn.prepareStatement("UPDATE recetas SET nombre=?, cantidad=?, para=?, tiempo_total=?, tiempo_thermomix=?, id_categoria=? WHERE id=?");
+			
+			PreparedStatement sentencia = conn.prepareStatement("update recetas set nombre=?, cantidad=?, para=?, tiempo_total=?, tiempo_thermomix=?, id_categoria=? where id=?");
 			sentencia.setString(1, receta.getNombre());
 			sentencia.setInt(2, receta.getCantidad());
 			sentencia.setString(3, receta.getPara());
@@ -92,7 +98,7 @@ public class RecetasService implements IRecetasService {
 			sentencia.setLong(7, receta.getId());
 			sentencia.executeUpdate();
 			sentencia.close();
-
+			
 			// crear las anotaciones
 			for (AnotacionItem anotacion : receta.getAnotaciones()) {
 				if (anotacion.getId() == null) {
@@ -105,7 +111,7 @@ public class RecetasService implements IRecetasService {
 			for (AnotacionItem anotacion : recetaActual.getAnotaciones()) {
 				eliminarAnotacion(anotacion);
 			}
-
+			
 			// crear las secciones
 			for (SeccionItem seccion : receta.getSecciones()) {
 				if (seccion.getId() == null) {
@@ -118,7 +124,7 @@ public class RecetasService implements IRecetasService {
 			for (SeccionItem seccion : recetaActual.getSecciones()) {
 				eliminarSeccion(seccion);
 			}
-
+			
 			conn.commit();
 			conn.setAutoCommit(true);
 		} catch (SQLException e) {
@@ -135,7 +141,7 @@ public class RecetasService implements IRecetasService {
 	public void eliminarReceta(Long id) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
-			PreparedStatement sentencia = conn.prepareStatement("DELETE FROM recetas WHERE id=?");
+			PreparedStatement sentencia = conn.prepareStatement("delete from recetas where id=?");
 			sentencia.setLong(1, id);
 			sentencia.execute();
 			sentencia.close();
@@ -143,20 +149,20 @@ public class RecetasService implements IRecetasService {
 			throw new ServiceException("Error al eliminar la receta con ID '" + id + "': " + e.getMessage());
 		}			
 	}
-
+	
 	public List<RecetaListItem> buscarRecetas(String nombre, Integer tiempoTotal, Long idCategoria) throws ServiceException {
 		List<RecetaListItem> recetas = new ArrayList<RecetaListItem>();
 		try {
 			Connection conn = BaseDatos.getConnection();
-
-			String sql = "SELECT r.*, c.descripcion AS categoria FROM recetas r LEFT JOIN categorias c ON r.id_categoria=c.id WHERE nombre LIKE ?";
+			
+			String sql = "select r.*, c.descripcion as categoria from recetas r left join categorias c on r.id_categoria=c.id where nombre like ?";
 			if (nombre == null) nombre = "";
-			if (tiempoTotal != null) sql += " AND tiempo_total<=?";
-			if (idCategoria != null) sql += " AND id_categoria=?";
-
+			if (tiempoTotal != null) sql += " and tiempo_total<=?";
+			if (idCategoria != null) sql += " and id_categoria=?";
+			
 			PreparedStatement sentencia = conn.prepareStatement(sql);
 			sentencia.setString(1, "%" + nombre + "%");
-
+			
 			if (tiempoTotal != null && idCategoria != null) {
 				sentencia.setInt(2, tiempoTotal);
 				sentencia.setLong(3, idCategoria);
@@ -165,7 +171,7 @@ public class RecetasService implements IRecetasService {
 			} else if (idCategoria != null) {
 				sentencia.setLong(2, idCategoria);
 			}
-
+			
 			ResultSet rs = sentencia.executeQuery();
 			while (rs.next()) {
 				recetas.add(resultSetToListItem(rs));
@@ -183,7 +189,7 @@ public class RecetasService implements IRecetasService {
 		try {
 			Connection conn = BaseDatos.getConnection();
 			Statement sentencia = conn.createStatement();
-			ResultSet rs = sentencia.executeQuery("SELECT r.*, c.descripcion AS categoria FROM recetas r LEFT JOIN categorias c ON r.id_categoria=c.id");
+			ResultSet rs = sentencia.executeQuery("select r.*, c.descripcion as categoria from recetas r left join categorias c on r.id_categoria=c.id");
 			while (rs.next()) {
 				recetas.add(resultSetToListItem(rs));
 			}
@@ -194,7 +200,7 @@ public class RecetasService implements IRecetasService {
 		}			
 		return recetas;
 	}
-
+	
 	public RecetaItem obtenerReceta(Long id) throws ServiceException {
 		RecetaItem receta = null;
 		try {
@@ -275,7 +281,7 @@ public class RecetasService implements IRecetasService {
 		}			
 		return secciones;
 	}
-
+	
 	private List<IngredienteItem> listarIngredientes(Long id) throws ServiceException {
 		List<IngredienteItem> ingredientes = new ArrayList<IngredienteItem>();
 		try {
@@ -303,7 +309,7 @@ public class RecetasService implements IRecetasService {
 		}			
 		return ingredientes;
 	}
-
+	
 	private List<InstruccionItem> listarInstrucciones(Long id) throws ServiceException {
 		List<InstruccionItem> instrucciones = new ArrayList<InstruccionItem>();
 		try {
@@ -338,7 +344,7 @@ public class RecetasService implements IRecetasService {
 		receta.setCategoria(rs.getString("categoria"));
 		return receta;
 	}
-
+	
 	private void crearAnotacion(Long idReceta, AnotacionItem anotacion) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
@@ -360,24 +366,24 @@ public class RecetasService implements IRecetasService {
 			sentencia.setString(1, seccion.getNombre());
 			sentencia.setLong(2, idReceta);
 			sentencia.executeUpdate();
-			ResultSet rs = sentencia.getGeneratedKeys();
-			Long idSeccion = null;
-			if (rs.next()) {
-				idSeccion = rs.getLong(1);
-			}
-			rs.close();
+	        ResultSet rs = sentencia.getGeneratedKeys();
+	        Long idSeccion = null;
+	        if (rs.next()) {
+	            idSeccion = rs.getLong(1);
+	        }
+	        rs.close();
 			sentencia.close();
 
 			// crear ingredientes
 			for (IngredienteItem ingrediente : seccion.getIngredientes()) {
 				crearIngrediente(idSeccion, ingrediente);
 			}
-
+			
 			// crear instrucciones
 			for (InstruccionItem instruccion : seccion.getInstrucciones()) {
 				crearInstruccion(idSeccion, instruccion);
 			}
-
+			
 		} catch (SQLException e) {
 			throw new ServiceException("Error al crear la sección '" + seccion.getNombre() + "': " + e.getMessage());
 		}		
@@ -412,7 +418,7 @@ public class RecetasService implements IRecetasService {
 		}	
 	}
 
-
+	
 	private void modificarAnotacion(AnotacionItem anotacion) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
@@ -444,7 +450,7 @@ public class RecetasService implements IRecetasService {
 	private void modificarSeccion(SeccionItem seccion) throws ServiceException {
 		try {
 			Connection conn = BaseDatos.getConnection();
-
+			
 			SeccionItem seccionActual = obtenerSeccion(seccion.getId()); 
 
 			PreparedStatement sentencia = conn.prepareStatement("update partes set nombre=? where id=?");
@@ -452,7 +458,7 @@ public class RecetasService implements IRecetasService {
 			sentencia.setLong(2, seccion.getId());
 			sentencia.executeUpdate();
 			sentencia.close();
-
+			
 			// modificar los ingredientes
 			for (IngredienteItem ingrediente : seccion.getIngredientes()) {
 				if (ingrediente.getId() == null) {
@@ -465,7 +471,7 @@ public class RecetasService implements IRecetasService {
 			for (IngredienteItem ingrediente : seccionActual.getIngredientes()) {
 				eliminarIngrediente(ingrediente);
 			}
-
+			
 			// modificar las instrucciones
 			for (InstruccionItem instruccion : seccion.getInstrucciones()) {
 				if (instruccion.getId() == null) {
@@ -478,7 +484,7 @@ public class RecetasService implements IRecetasService {
 			for (InstruccionItem instruccion : seccionActual.getInstrucciones()) {
 				eliminarInstruccion(instruccion);
 			}
-
+			
 		} catch (SQLException e) {
 			throw new ServiceException("Error al actualizar la sección con ID '" + seccion.getId() + "': " + e.getMessage());
 		}		
@@ -488,6 +494,7 @@ public class RecetasService implements IRecetasService {
 		SeccionItem seccion = null;
 		try {
 			Connection conn = BaseDatos.getConnection();
+			
 			PreparedStatement sentencia = conn.prepareStatement("select * from partes where id=?");
 			sentencia.setLong(1, id);
 			ResultSet rs = sentencia.executeQuery();
@@ -498,6 +505,34 @@ public class RecetasService implements IRecetasService {
 			}
 			rs.close();
 			sentencia.close();
+
+			PreparedStatement sentenciaIng = conn.prepareStatement("select * from ingredientes where id_parte=?");
+			sentenciaIng.setLong(1, id);
+			ResultSet rsIng = sentenciaIng.executeQuery();
+			while (rsIng.next()) {
+				IngredienteItem ingrediente = new IngredienteItem();
+				ingrediente.setId(rsIng.getLong("id"));
+				ingrediente.setCantidad(rsIng.getInt("cantidad"));
+				ingrediente.setMedida(ServiceLocator.getMedidasService().obtenerMedida(rsIng.getLong("id_medida")));
+				ingrediente.setTipo(ServiceLocator.getTiposIngredientesService().obtenerTiposIngredientes(rsIng.getLong("id_tipo")));
+				seccion.getIngredientes().add(ingrediente);
+			}
+			rsIng.close();
+			sentenciaIng.close();
+			
+			PreparedStatement sentenciaIns = conn.prepareStatement("select * from instrucciones where id_parte=?");
+			sentenciaIns.setLong(1, id);
+			ResultSet rsIns = sentenciaIns.executeQuery();
+			while (rsIns.next()) {
+				InstruccionItem instruccion = new InstruccionItem();
+				instruccion.setId(rsIns.getLong("id"));
+				instruccion.setDescripcion(rsIns.getString("descripcion"));
+				instruccion.setOrden(rsIns.getInt("orden"));
+				seccion.getInstrucciones().add(instruccion);
+			}
+			rsIns.close();
+			sentenciaIns.close();
+			
 		} catch (SQLException e) {
 			throw new ServiceException("Error al obtener la sección con ID '" + id + "': " + e.getMessage());
 		}			
@@ -570,5 +605,5 @@ public class RecetasService implements IRecetasService {
 			throw new ServiceException("Error al eliminar la sección con ID '" + seccion.getId() + "': " + e.getMessage());
 		}		
 	}
-
+	
 }
