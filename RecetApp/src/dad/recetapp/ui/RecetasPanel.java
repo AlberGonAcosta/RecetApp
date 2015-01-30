@@ -104,8 +104,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 		NuevaRecetaWindow nuevaRecetaWindow = null;
 
 		try {
-			nuevaRecetaWindow = (NuevaRecetaWindow) RecetappApplication
-					.loadWindow("dad/recetapp/ui/NuevaRecetaWindow.bxml");
+			nuevaRecetaWindow = (NuevaRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/NuevaRecetaWindow.bxml");
 			nuevaRecetaWindow.setVariables(variables);
 			nuevaRecetaWindow.open(getDisplay());
 		} catch (IOException e) {
