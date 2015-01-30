@@ -23,6 +23,7 @@ import org.apache.pivot.wtk.Sheet;
 import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.TableView;
 import org.apache.pivot.wtk.TextInput;
+import org.apache.pivot.wtk.Window;
 
 import dad.recetapp.RecetappApplication;
 import dad.recetapp.services.items.IngredienteItem;
@@ -46,107 +47,96 @@ public class ComponenteReceta extends FillPane implements Bindable {
 	@BXML
 	public TableView ingredientesTable;
 	@BXML
-	public static TableView instruccionesTable;
+	public TableView instruccionesTable;
 	public org.apache.pivot.collections.List<IngredienteItem> variablesIngredientes;
-	public static org.apache.pivot.collections.List<InstruccionItem> variablesInstrucciones;
-	
-	public static IngredienteItem nuevoIngrediente;
-	
+	public org.apache.pivot.collections.List<InstruccionItem> variablesInstrucciones;
+	public Window parent;
+
 	@Override
-	public void initialize(Map<String, Object> namespace, URL location,
-			Resources resources) {
-		
+	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
+
 		variablesIngredientes = new org.apache.pivot.collections.ArrayList<IngredienteItem>();
 		variablesInstrucciones = new org.apache.pivot.collections.ArrayList<InstruccionItem>();
 
-		seccionText.getComponentKeyListeners().add(
-				new ComponentKeyListener.Adapter() {
-					@Override
-					public boolean keyTyped(Component arg0, char arg1) {
-						try {
-							NuevaRecetaWindow.cambiarTituloPestana(seccionText
-									.getText());
-							NuevaRecetaWindow.tabPaneNuevaReceta.repaint();
-						} catch (NullPointerException e) {
-						}
-						try {
-							EditarRecetaWindow.cambiarTituloPestana(seccionText
-									.getText());
-							EditarRecetaWindow.tabPaneEditarReceta.repaint();
-						} catch (NullPointerException e) {
-						}
-						return false;
+		seccionText.getComponentKeyListeners().add(new ComponentKeyListener.Adapter() {
+			@SuppressWarnings("static-access")
+			@Override
+			public boolean keyTyped(Component arg0, char arg1) {
+				if (parent instanceof NuevaRecetaWindow){
+					try {
+						((NuevaRecetaWindow) parent).cambiarTituloPestana(seccionText.getText());
+						((NuevaRecetaWindow) parent).tabPaneNuevaReceta.repaint();
+					} catch (NullPointerException e) {
 					}
-
-				});
-
-		eliminarPestanaButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						try {
-							NuevaRecetaWindow.eliminarPestanaActual();
-						} catch (NullPointerException e) {
-						}
-						try {
-							EditarRecetaWindow.eliminarPestanaActual();
-
-						} catch (NullPointerException e) {
-						}
+				} else {
+					try {
+						((EditarRecetaWindow) parent).cambiarTituloPestana(seccionText.getText());
+						((EditarRecetaWindow) parent).tabPaneEditarReceta.repaint();
+					} catch (NullPointerException e) {
 					}
-				});
+				}
+				return false;
+			}
+		});
 
-		anadirIngredienteButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						anadirIngrediente();
-					}
-				});
+		eliminarPestanaButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				try {
+					NuevaRecetaWindow.eliminarPestanaActual();
+				} catch (NullPointerException e) {
+				}
+				try {
+					EditarRecetaWindow.eliminarPestanaActual();
+				} catch (NullPointerException e) {
+				}
+			}
+		});
 
-		anadirInstruccionButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						anadirInstruccion();
-					}
-				});
+		anadirIngredienteButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				anadirIngrediente();
+			}
+		});
 
-		editarIngredienteButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						editarIngrediente();
-					}
-				});
+		anadirInstruccionButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				anadirInstruccion();
+			}
+		});
 
-		editarInstruccionButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						editarInstruccion();
-					}
-				});
+		editarIngredienteButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				editarIngrediente();
+			}
+		});
 
-		eliminarIngredienteButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						eliminarIngrediente();
-					}
-				});
+		editarInstruccionButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				editarInstruccion();
+			}
+		});
 
-		eliminarInstruccionButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
-					@Override
-					public void buttonPressed(Button button) {
-						eliminarInstruccion();
-					}
-				});
+		eliminarIngredienteButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				eliminarIngrediente();
+			}
+		});
+
+		eliminarInstruccionButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				eliminarInstruccion();
+			}
+		});
 	}
 
 	private void editarIngrediente() {
-
 		Sequence<?> seleccionados = ingredientesTable.getSelectedRows();
 		if (seleccionados.getLength() != 1) {
 			Prompt error = new Prompt("Debe seleccionar un ingrediente.");
@@ -157,20 +147,33 @@ public class ComponenteReceta extends FillPane implements Bindable {
 		} else {
 			EditarIngredienteDialog editarIngredienteDialog = null;
 			try {
-				editarIngredienteDialog = (EditarIngredienteDialog) RecetappApplication
-						.loadWindow("dad/recetapp/ui/EditarIngredienteDialog.bxml");
+				editarIngredienteDialog = (EditarIngredienteDialog) RecetappApplication.loadWindow("dad/recetapp/ui/EditarIngredienteDialog.bxml");
+				IngredienteItem ingredienteSeleccionado = null;
+
+				for (int i = 0; i < seleccionados.getLength(); i++) {
+					ingredienteSeleccionado = (IngredienteItem) seleccionados.get(i);
+				}
+
+				editarIngredienteDialog.setIngrediente(ingredienteSeleccionado);
+				editarIngredienteDialog.open(this.getWindow(), new DialogCloseListener() {
+					@Override
+					public void dialogClosed(Dialog d, boolean arg1) {
+						EditarIngredienteDialog nid = (EditarIngredienteDialog) d;
+						if (nid.getAceptar()) {
+							variablesIngredientes.update(ingredientesTable.getLastSelectedIndex(),nid.getIngrediente());
+							ingredientesTable.setTableData(variablesIngredientes);
+						}
+					}
+				});
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (SerializationException e) {
 				e.printStackTrace();
 			}
-			editarIngredienteDialog.open(getDisplay());
 		}
-
 	}
 
 	private void editarInstruccion() {
-
 		Sequence<?> seleccionados = instruccionesTable.getSelectedRows();
 		if (seleccionados.getLength() != 1) {
 			Prompt error = new Prompt("Debe seleccionar una instrucción.");
@@ -182,12 +185,29 @@ public class ComponenteReceta extends FillPane implements Bindable {
 			EditarInstruccionDialog editarInstruccionDialog = null;
 			try {
 				editarInstruccionDialog = (EditarInstruccionDialog) RecetappApplication.loadWindow("dad/recetapp/ui/EditarInstruccionDialog.bxml");
+				InstruccionItem instruccionSeleccionada = null;
+
+				for (int i = 0; i < seleccionados.getLength(); i++) {
+					instruccionSeleccionada = (InstruccionItem) seleccionados.get(i);
+				}
+
+				editarInstruccionDialog.setInstruccion(instruccionSeleccionada);
+				editarInstruccionDialog.open(this.getWindow(), new DialogCloseListener() {
+					@Override
+					public void dialogClosed(Dialog d, boolean arg1) {
+						EditarInstruccionDialog nid = (EditarInstruccionDialog) d;
+
+						if (nid.getAceptar()) {
+							variablesInstrucciones.update(instruccionesTable.getLastSelectedIndex(),nid.getInstruccion());
+							instruccionesTable.setTableData(variablesInstrucciones);
+						}
+					}
+				});
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (SerializationException e) {
 				e.printStackTrace();
 			}
-			editarInstruccionDialog.open(getDisplay());
 		}
 	}
 
@@ -195,12 +215,21 @@ public class ComponenteReceta extends FillPane implements Bindable {
 		NuevaInstruccionDialog nuevaInstruccionDialog = null;
 		try {
 			nuevaInstruccionDialog = (NuevaInstruccionDialog) RecetappApplication.loadWindow("dad/recetapp/ui/NuevaInstruccionDialog.bxml");
+			nuevaInstruccionDialog.open(this.getWindow(), new DialogCloseListener() {
+				@Override
+				public void dialogClosed(Dialog d, boolean arg1) {
+					NuevaInstruccionDialog nid = (NuevaInstruccionDialog) d;
+					if (nid.getAceptar()) {
+						variablesInstrucciones.add(nid.getInstruccion());
+						instruccionesTable.setTableData(variablesInstrucciones);
+					}
+				}
+			});
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SerializationException e) {
 			e.printStackTrace();
 		}
-		nuevaInstruccionDialog.open(getDisplay());
 	}
 
 	private void anadirIngrediente() {
@@ -211,7 +240,6 @@ public class ComponenteReceta extends FillPane implements Bindable {
 				@Override
 				public void dialogClosed(Dialog d, boolean arg1) {
 					NuevoIngredienteDialog nid = (NuevoIngredienteDialog) d;
-					
 					if (nid.getAceptar()) {
 						variablesIngredientes.add(nid.getIngrediente());
 						ingredientesTable.setTableData(variablesIngredientes);
@@ -235,8 +263,7 @@ public class ComponenteReceta extends FillPane implements Bindable {
 			});
 		} else {
 			for (int i = 0; i < seleccionados.getLength(); i++) {
-				IngredienteItem ingredienteSeleccionado = (IngredienteItem) seleccionados
-						.get(i);
+				IngredienteItem ingredienteSeleccionado = (IngredienteItem) seleccionados.get(i);
 				variablesIngredientes.remove(ingredienteSeleccionado);
 			}
 		}
@@ -252,28 +279,23 @@ public class ComponenteReceta extends FillPane implements Bindable {
 			});
 		} else {
 			for (int i = 0; i < seleccionados.getLength(); i++) {
-				InstruccionItem instruccionSeleccionada = (InstruccionItem) seleccionados
-						.get(i);
+				InstruccionItem instruccionSeleccionada = (InstruccionItem) seleccionados.get(i);
 				variablesInstrucciones.remove(instruccionSeleccionada);
 			}
 		}
 	}
 
-	// TODO
 	public SeccionItem getSeccion() {
 		SeccionItem seccion = new SeccionItem();
 		seccion.setNombre(seccionText.getText());
 		seccion.setIngredientes(convertirListIngredientes(variablesIngredientes));
 		seccion.setInstrucciones(convertirListInstrucciones(variablesInstrucciones));
-
 		return seccion;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected static java.util.List<IngredienteItem> convertirListIngredientes(
-			org.apache.pivot.collections.List listaUtil) {
+	protected static java.util.List<IngredienteItem> convertirListIngredientes(org.apache.pivot.collections.List listaUtil) {
 		List listaApache = new ArrayList();
-
 		for (int i = 0; i < listaUtil.getLength(); i++) {
 			listaApache.add(listaUtil.get(i));
 		}
@@ -281,13 +303,15 @@ public class ComponenteReceta extends FillPane implements Bindable {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected static java.util.List<InstruccionItem> convertirListInstrucciones(
-			org.apache.pivot.collections.List listaUtil) {
+	protected static java.util.List<InstruccionItem> convertirListInstrucciones(org.apache.pivot.collections.List listaUtil) {
 		List listaApache = new ArrayList();
-
 		for (int i = 0; i < listaUtil.getLength(); i++) {
 			listaApache.add(listaUtil.get(i));
 		}
 		return listaApache;
+	}
+
+	public void setParent(Window parent){
+		this.parent = parent;
 	}
 }

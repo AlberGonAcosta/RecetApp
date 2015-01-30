@@ -9,7 +9,6 @@ import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.BXMLSerializer;
 import org.apache.pivot.beans.Bindable;
 import org.apache.pivot.collections.Map;
-import org.apache.pivot.collections.Sequence;
 import org.apache.pivot.serialization.SerializationException;
 import org.apache.pivot.util.Resources;
 import org.apache.pivot.wtk.Button;
@@ -52,21 +51,26 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	private RecetaItem receta;
 
 	@Override
-	public void initialize(Map<String, Object> namespace, URL location,
-			Resources resources) {
-
+	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
 		componentes = new ArrayList<ComponenteReceta>();
-		Sequence<?> seleccionados = RecetasPanel.tableView.getSelectedRows();
-		for (int i = 0; i < seleccionados.getLength(); i++) {
-			try {
-				RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados
-						.get(i);
-				Long id = recetaSeleccionada.getId();
-				receta = ServiceLocator.getRecetasService().obtenerReceta(id);
-			} catch (ServiceException e) {
-				e.printStackTrace();
-			}
+		RecetaListItem recetaSeleccionada = (RecetaListItem) RecetasPanel.tableView.getSelectedRow();
+		Long id = recetaSeleccionada.getId();
+		try {
+			receta = ServiceLocator.getRecetasService().obtenerReceta(id);
+		} catch (ServiceException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
+//		Sequence<?> seleccionados = RecetasPanel.tableView.getSelectedRows();
+//		for (int i = 0; i < seleccionados.getLength(); i++) {
+//			try {
+//				RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
+//				Long id = recetaSeleccionada.getId();
+//				receta = ServiceLocator.getRecetasService().obtenerReceta(id);
+//			} catch (ServiceException e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 		int minutosTotal = receta.getTiempoTotal() / 60;
 		int segundosTotal = receta.getTiempoTotal() % 60;
@@ -82,43 +86,23 @@ public class EditarRecetaWindow extends Window implements Bindable {
 
 		try {
 			recargarCategoriaListButton();
-
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 
 		categoriasListButton.setSelectedIndex(0);
 
-		tabPaneEditarReceta.getComponentMouseButtonListeners().add(
-				new ComponentMouseButtonListener() {
+		tabPaneEditarReceta.getComponentMouseButtonListeners().add(new ComponentMouseButtonListener.Adapter() {
 					@Override
-					public boolean mouseUp(Component arg0,
-							org.apache.pivot.wtk.Mouse.Button arg1, int arg2,
-							int arg3) {
-						return false;
-					}
-
-					@Override
-					public boolean mouseDown(Component arg0,
-							org.apache.pivot.wtk.Mouse.Button arg1, int arg2,
-							int arg3) {
-						return false;
-					}
-
-					@Override
-					public boolean mouseClick(Component arg0,
-							org.apache.pivot.wtk.Mouse.Button arg1, int arg2,
-							int arg3, int arg4) {
-						if (tabPaneEditarReceta.getSelectedIndex() == tabPaneEditarReceta
-								.getTabs().getLength() - 1) {
+					public boolean mouseClick(Component arg0,org.apache.pivot.wtk.Mouse.Button arg1, int arg2,int arg3, int arg4) {
+						if (tabPaneEditarReceta.getSelectedIndex() == tabPaneEditarReceta.getTabs().getLength() - 1) {
 							crearNuevoPanelComponente();
 						}
 						return false;
 					}
 				});
 
-		cancelarRecetaWindowButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
+		cancelarRecetaWindowButton.getButtonPressListeners().add(new ButtonPressListener() {
 					@Override
 					public void buttonPressed(Button arg0) {
 						close();
@@ -127,19 +111,15 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	}
 
 	protected void crearNuevoPanelComponente() {
-
 		try {
 			URL bxmlUrl = getClass().getResource("ComponenteReceta.bxml");
 			BXMLSerializer serializer = new BXMLSerializer();
-			ComponenteReceta componenteReceta = (ComponenteReceta) serializer
-					.readObject(bxmlUrl);
+			ComponenteReceta componenteReceta = (ComponenteReceta) serializer.readObject(bxmlUrl);
 
-			tabPaneEditarReceta.getTabs().insert(componenteReceta,
-					tabPaneEditarReceta.getLength() - 2);
+			tabPaneEditarReceta.getTabs().insert(componenteReceta,tabPaneEditarReceta.getLength() - 2);
 			tabPaneEditarReceta.setSelectedTab(componenteReceta);
 
-			componenteReceta.setName("componente"
-					+ tabPaneEditarReceta.getSelectedIndex());
+			componenteReceta.setName("componente"+ tabPaneEditarReceta.getSelectedIndex());
 
 			componentes.add(componenteReceta);
 
@@ -150,9 +130,8 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	}
 
 	@SuppressWarnings("static-access")
-	public static void cambiarTituloPestana(String titulo) {
-		tabPaneEditarReceta.setTabData(tabPaneEditarReceta.getSelectedTab(),
-				titulo);
+	public void cambiarTituloPestana(String titulo) {
+		tabPaneEditarReceta.setTabData(tabPaneEditarReceta.getSelectedTab(),titulo);
 	}
 
 	public static void eliminarPestanaActual() {
@@ -168,25 +147,20 @@ public class EditarRecetaWindow extends Window implements Bindable {
 			tabPaneEditarReceta.getTabs().remove(posicion, 1);
 		} else if (tabPaneEditarReceta.getTabs().getLength() == 2) {
 
-			tabPaneEditarReceta.setSelectedIndex(tabPaneEditarReceta.getTabs()
-					.getLength() - 1);
-			tabPaneEditarReceta.getTabs().remove(
-					tabPaneEditarReceta.getSelectedIndex() - 1, 1);
+			tabPaneEditarReceta.setSelectedIndex(tabPaneEditarReceta.getTabs().getLength() - 1);
+			tabPaneEditarReceta.getTabs().remove(tabPaneEditarReceta.getSelectedIndex() - 1, 1);
 			componentes.remove(tabPaneEditarReceta.getSelectedIndex() - 1);
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
 	public static void recargarCategoriaListButton() throws ServiceException {
-		categoriasBD = convertirList(ServiceLocator.getCategoriasService()
-				.listarCategorias());
+		categoriasBD = convertirList(ServiceLocator.getCategoriasService().listarCategorias());
 		categoriasListButton.setListData(categoriasBD);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected static org.apache.pivot.collections.List convertirList(
-			java.util.List<?> listaUtil) {
+	protected static org.apache.pivot.collections.List convertirList(java.util.List<?> listaUtil) {
 		org.apache.pivot.collections.List listaApache = new org.apache.pivot.collections.ArrayList();
 		for (int i = 0; i < listaUtil.size(); i++) {
 			listaApache.add(listaUtil.get(i));

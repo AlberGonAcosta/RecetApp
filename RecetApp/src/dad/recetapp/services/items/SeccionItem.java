@@ -1,13 +1,14 @@
 package dad.recetapp.services.items;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SeccionItem {
 
 	private Long id;
 	private String nombre;
-	private List<InstruccionItem> instrucciones;
-	private List<IngredienteItem> ingredientes;
+	private List<InstruccionItem> instrucciones = new ArrayList<InstruccionItem>();
+	private List<IngredienteItem> ingredientes = new ArrayList<IngredienteItem>();
 	
 	public Long getId() {
 		return id;

@@ -35,7 +35,6 @@ public class RecetappApplication implements Application{
 	
 	@Override
 	public boolean shutdown(boolean optional) throws Exception {
-		
 		if (pantallaInicio != null) 
 			pantallaInicio.close();
 		

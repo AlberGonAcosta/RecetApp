@@ -16,6 +16,9 @@ import org.apache.pivot.wtk.TextInput;
 import dad.recetapp.services.items.InstruccionItem;
 
 public class NuevaInstruccionDialog extends Dialog implements Bindable {
+	
+	private Boolean aceptar = false;
+	
 	@BXML
 	private NuevaInstruccionDialog nuevaInstruccionDialog;
 	@BXML
@@ -27,8 +30,12 @@ public class NuevaInstruccionDialog extends Dialog implements Bindable {
 	@BXML
 	private Label errorLabel;
 
+	InstruccionItem instruccion;
+	
 	public void initialize(Map<String, Object> namespace, URL location,
 			Resources resources) {
+		
+		instruccion = new InstruccionItem();
 
 		cancelarInstruccionButton.getButtonPressListeners().add(
 				new ButtonPressListener() {
@@ -46,22 +53,24 @@ public class NuevaInstruccionDialog extends Dialog implements Bindable {
 								|| descripcionText.getText().equals("")) {
 							errorLabel
 									.setText("Debe rellenar todos los campos");
-						} else {
-							InstruccionItem instruccion = new InstruccionItem();
-							instruccion.setOrden(Integer.valueOf(ordenText
-									.getText()));
-							instruccion.setDescripcion(descripcionText
-									.getText());
+						} 
+						else {
+							instruccion.setOrden(Integer.valueOf(ordenText.getText()));
+							instruccion.setDescripcion(descripcionText.getText());
 
-							ComponenteReceta.variablesInstrucciones
-									.add(instruccion);
-
-							ComponenteReceta.instruccionesTable
-									.setTableData(ComponenteReceta.variablesInstrucciones);
-
-							nuevaInstruccionDialog.close();
+							aceptar = true;
+							NuevaInstruccionDialog.this.close();
 						}
 					}
 				});
 	}
+	
+	public InstruccionItem getInstruccion(){
+		return this.instruccion;
+	}
+
+	public Boolean getAceptar() {
+		return aceptar;
+	}
+	
 }

@@ -40,9 +40,11 @@ public class NuevoIngredienteDialog extends Dialog implements Bindable {
 	private static org.apache.pivot.collections.List<TipoIngredienteItem> tiposIngredientesBD;
 
 	@Override
-	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
+	public void initialize(Map<String, Object> namespace, URL location,
+			Resources resources) {
 		
 		ingrediente = new IngredienteItem();
+		
 		
 		try {
 			cargarCombos();
@@ -65,13 +67,13 @@ public class NuevoIngredienteDialog extends Dialog implements Bindable {
 						if (cantidadText.getText().equals("")|| medidasListButton.getSelectedItem().toString().equals("<Seleccione la medida>")|| tipoIngredienteListButton.getSelectedItem().toString().equals("<Seleccione el tipo de instruccion>")) {
 							errorLabel.setText("Debe rellenar todos los campos");
 						} else {
-							ingrediente = new IngredienteItem();
 							ingrediente.setCantidad(Integer.valueOf(cantidadText.getText()));
 							ingrediente.setMedida((MedidaItem) medidasListButton.getSelectedItem());
 							ingrediente.setTipo((TipoIngredienteItem) tipoIngredienteListButton.getSelectedItem());
 							aceptar = true;
 							NuevoIngredienteDialog.this.close();
 						}
+
 					}
 				});
 	}
@@ -81,15 +83,17 @@ public class NuevoIngredienteDialog extends Dialog implements Bindable {
 		MedidaItem medidaTitle = new MedidaItem();
 		medidaTitle.setId(null);
 		medidaTitle.setNombre("<Seleccione la medida>");
-		medidasBD = convertirList(ServiceLocator.getMedidasService().listarMedidas());
+		medidasBD = convertirList(ServiceLocator.getMedidasService()
+				.listarMedidas());
 		medidasBD.insert(medidaTitle, 0);
 		medidasListButton.setListData(medidasBD);
 		medidasListButton.setSelectedItem(medidaTitle);
-
+		// ----------------------------------------------------
 		TipoIngredienteItem tipoIngredienteTitle = new TipoIngredienteItem();
 		tipoIngredienteTitle.setId(null);
 		tipoIngredienteTitle.setNombre("<Seleccione el tipo de instruccion>");
-		tiposIngredientesBD = convertirList(ServiceLocator.getTiposIngredientesService().listarTiposIngredientes());
+		tiposIngredientesBD = convertirList(ServiceLocator
+				.getTiposIngredientesService().listarTiposIngredientes());
 		tiposIngredientesBD.insert(tipoIngredienteTitle, 0);
 		tipoIngredienteListButton.setListData(tiposIngredientesBD);
 		tipoIngredienteListButton.setSelectedItem(tipoIngredienteTitle);
@@ -112,4 +116,7 @@ public class NuevoIngredienteDialog extends Dialog implements Bindable {
 	public Boolean getAceptar() {
 		return aceptar;
 	}
+	
+	
+
 }

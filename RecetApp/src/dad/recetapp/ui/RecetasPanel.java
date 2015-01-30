@@ -37,7 +37,6 @@ public class RecetasPanel extends FillPane implements Bindable {
 
 	@BXML
 	private SplitPane splitPane;
-
 	@BXML
 	public static TableView tableView;
 	public static org.apache.pivot.collections.List<RecetaListItem> variables;
@@ -51,7 +50,6 @@ public class RecetasPanel extends FillPane implements Bindable {
 	private Button eliminarRecetaButton;
 	@BXML
 	private Button editarRecetaButton;
-
 	@BXML
 	private TextInput filtrarNombre;
 	@BXML
@@ -59,50 +57,42 @@ public class RecetasPanel extends FillPane implements Bindable {
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public void initialize(Map<String, Object> namespace, URL location,
-			Resources resources) {
+	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
 
 		variables = new org.apache.pivot.collections.ArrayList<RecetaListItem>();
 
 		filtrarDatosTabla();
 
 		try {
-			lista = convertirList(ServiceLocator.getRecetasService()
-					.listarRecetas());
+			lista = convertirList(ServiceLocator.getRecetasService().listarRecetas());
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 		for (RecetaListItem l : lista) {
 			variables.add(l);
 		}
-
 		tableView.setTableData(variables);
-
 		try {
 			recargarCategoriaListButton();
-
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 
-		anadirRecetaButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
+		anadirRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
 					@Override
 					public void buttonPressed(Button button) {
 						onAnadirRecetaButtonActionPerformed();
 					}
 				});
 
-		eliminarRecetaButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
+		eliminarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
 					@Override
 					public void buttonPressed(Button button) {
 						onEliminarRecetaButtonActionPerformed();
 					}
 				});
 
-		editarRecetaButton.getButtonPressListeners().add(
-				new ButtonPressListener() {
+		editarRecetaButton.getButtonPressListeners().add(new ButtonPressListener() {
 					@Override
 					public void buttonPressed(Button button) {
 						onEditarRecetaButtonActionPerformed();
@@ -116,14 +106,14 @@ public class RecetasPanel extends FillPane implements Bindable {
 		try {
 			nuevaRecetaWindow = (NuevaRecetaWindow) RecetappApplication
 					.loadWindow("dad/recetapp/ui/NuevaRecetaWindow.bxml");
+			nuevaRecetaWindow.setVariables(variables);
+			nuevaRecetaWindow.open(getDisplay());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SerializationException e) {
 			e.printStackTrace();
 		}
-
-		nuevaRecetaWindow.open(getDisplay());
-
+		recargarTabla();
 	}
 
 	protected void onEditarRecetaButtonActionPerformed() {
@@ -137,8 +127,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 		} else {
 			EditarRecetaWindow editarRecetaWindow = null;
 			try {
-				editarRecetaWindow = (EditarRecetaWindow) RecetappApplication
-						.loadWindow("dad/recetapp/ui/EditarRecetaWindow.bxml");
+				editarRecetaWindow = (EditarRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/EditarRecetaWindow.bxml");
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (SerializationException e) {
@@ -146,6 +135,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 			}
 			editarRecetaWindow.open(getDisplay());
 		}
+		recargarTabla();
 	}
 
 	protected void onEliminarRecetaButtonActionPerformed() {
@@ -176,12 +166,9 @@ public class RecetasPanel extends FillPane implements Bindable {
 						Sequence<?> seleccionados = tableView.getSelectedRows();
 						for (int i = 0; i < seleccionados.getLength(); i++) {
 							try {
-								RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados
-										.get(i);
+								RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
 								variables.remove(recetaSeleccionada);
-								ServiceLocator.getRecetasService()
-										.eliminarReceta(
-												recetaSeleccionada.getId());
+								ServiceLocator.getRecetasService().eliminarReceta(recetaSeleccionada.getId());
 								RecetappFrame.setNumReceta();
 							} catch (ServiceException e) {
 								e.printStackTrace();
@@ -191,6 +178,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 				}
 			});
 		}
+		recargarTabla();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -287,6 +275,10 @@ public class RecetasPanel extends FillPane implements Bindable {
 			}
 		}
 		tableView.setTableData(lista);
+	}
+	
+	protected void recargarTabla(){
+		tableView.setTableData(variables);
 	}
 
 }

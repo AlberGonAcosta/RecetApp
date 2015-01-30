@@ -26,7 +26,7 @@ import dad.recetapp.services.items.TipoIngredienteItem;
 
 public class RecetasService implements IRecetasService {
 	
-	public Long crearReceta(RecetaItem receta) throws ServiceException {
+	public void crearReceta(RecetaItem receta) throws ServiceException {
 		Connection conn = null;
 		Long id = null;
 		try {
@@ -76,7 +76,6 @@ public class RecetasService implements IRecetasService {
 			}
 			throw new ServiceException("Error al crear la receta '" + receta.getNombre() + "': " + e.getMessage());
 		}
-		return id;
 	}
 
 
