@@ -60,7 +60,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
 
 		variables = new org.apache.pivot.collections.ArrayList<RecetaListItem>();
-
+		
 		filtrarDatosTabla();
 
 		try {
@@ -107,6 +107,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 			nuevaRecetaWindow = (NuevaRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/NuevaRecetaWindow.bxml");
 			nuevaRecetaWindow.setVariables(variables);
 			nuevaRecetaWindow.open(getDisplay());
+			RecetappFrame.setNumReceta();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SerializationException e) {
@@ -127,12 +128,13 @@ public class RecetasPanel extends FillPane implements Bindable {
 			EditarRecetaWindow editarRecetaWindow = null;
 			try {
 				editarRecetaWindow = (EditarRecetaWindow) RecetappApplication.loadWindow("dad/recetapp/ui/EditarRecetaWindow.bxml");
+				editarRecetaWindow.setReceta((RecetaListItem)tableView.getSelectedRow());
+				editarRecetaWindow.open(getDisplay());
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (SerializationException e) {
 				e.printStackTrace();
 			}
-			editarRecetaWindow.open(getDisplay());
 		}
 		recargarTabla();
 	}
@@ -150,19 +152,14 @@ public class RecetasPanel extends FillPane implements Bindable {
 			mensaje.append("¿Desea eliminar las siguientes recetas?\n\n");
 
 			for (int i = 0; i < seleccionados.getLength(); i++) {
-				RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados
-						.get(i);
+				RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
 				mensaje.append(" - " + recetaSeleccionada.getNombre() + "\n");
 			}
 
-			Prompt confirmar = new Prompt(MessageType.WARNING,
-					mensaje.toString(), new ArrayList<String>("Sí", "No"));
+			Prompt confirmar = new Prompt(MessageType.WARNING, mensaje.toString(), new ArrayList<String>("Sí", "No"));
 			confirmar.open(this.getWindow(), new SheetCloseListener() {
 				public void sheetClosed(Sheet sheet) {
-
-					if (confirmar.getResult()
-							&& confirmar.getSelectedOption().equals("Sí")) {
-						Sequence<?> seleccionados = tableView.getSelectedRows();
+					if (confirmar.getResult() && confirmar.getSelectedOption().equals("Sí")) {
 						for (int i = 0; i < seleccionados.getLength(); i++) {
 							try {
 								RecetaListItem recetaSeleccionada = (RecetaListItem) seleccionados.get(i);
