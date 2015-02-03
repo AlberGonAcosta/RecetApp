@@ -16,6 +16,9 @@ import org.apache.pivot.wtk.ButtonPressListener;
 import org.apache.pivot.wtk.Component;
 import org.apache.pivot.wtk.ComponentMouseButtonListener;
 import org.apache.pivot.wtk.ListButton;
+import org.apache.pivot.wtk.Prompt;
+import org.apache.pivot.wtk.Sheet;
+import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.Spinner;
 import org.apache.pivot.wtk.TabPane;
 import org.apache.pivot.wtk.TextInput;
@@ -56,7 +59,7 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	private RecetaListItem recetaList;
 	private int posicionRecetaListSeleccionada;
 	private Long id;
-	
+
 	@Override
 	public void initialize(Map<String, Object> namespace, URL location,Resources resources) {
 
@@ -86,7 +89,7 @@ public class EditarRecetaWindow extends Window implements Bindable {
 				close();
 			}
 		});
-		
+
 		editarRecetaWindowButton.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
 			public void buttonPressed(Button arg0) {
@@ -96,40 +99,47 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	}
 
 	protected void editarReceta() {
-		
-		int minutosTotal = spinnerTotalM.getSelectedIndex();
-		int segundosTotal = spinnerTotalS.getSelectedIndex();
-		int minutosThermo = spinnerThermoM.getSelectedIndex();
-		int segundosThermo = spinnerThermoS.getSelectedIndex();
-		
-		recetaList.setNombre(nombreText.getText());
-		recetaList.setCantidad(Integer.parseInt(paraText.getText()));
-		recetaList.setCategoria(categoriasListButton.getSelectedItem().toString());
-		recetaList.setPara(paraCombo.getSelectedItem().toString());
-		recetaList.setTiempoTotal(minutosTotal*60 + segundosTotal);
-		recetaList.setTiempoThermomix(minutosThermo*60 + segundosThermo);
-		
-		receta.setNombre(nombreText.getText());
-		receta.setCantidad(Integer.parseInt(paraText.getText()));
-		receta.setCategoria((CategoriaItem)categoriasListButton.getSelectedItem());
-		receta.setPara(paraCombo.getSelectedItem().toString());
-		receta.setTiempoTotal(minutosTotal*60 + segundosTotal);
-		receta.setTiempoThermomix(minutosThermo*60 + segundosThermo);
-		
-		receta.getSecciones().removeAll(receta.getSecciones());
-		
-		for (ComponenteReceta componente : componentes) {
-			receta.getSecciones().add(componente.getSeccion());
-		}
-		
-		try {
-			ServiceLocator.getRecetasService().modificarReceta(receta);
-			RecetasPanel.variables.update(posicionRecetaListSeleccionada, recetaList);
-			RecetasPanel.tableView.setTableData(RecetasPanel.variables);
-		} catch (ServiceException e) {
-		}
+		if (nombreText.getText().equals("") || paraText.getText().equals("")) {
+			Prompt error = new Prompt("Los campos \"Nombre\", \"Para\" y \"Categoría\" son obligatorios.");
+			error.open(this.getWindow(), new SheetCloseListener() {
+				public void sheetClosed(Sheet sheet) {
+				}
+			});
+		} else {
+			int minutosTotal = spinnerTotalM.getSelectedIndex();
+			int segundosTotal = spinnerTotalS.getSelectedIndex();
+			int minutosThermo = spinnerThermoM.getSelectedIndex();
+			int segundosThermo = spinnerThermoS.getSelectedIndex();
 
-		close();
+			recetaList.setNombre(nombreText.getText());
+			recetaList.setCantidad(Integer.parseInt(paraText.getText()));
+			recetaList.setCategoria(categoriasListButton.getSelectedItem().toString());
+			recetaList.setPara(paraCombo.getSelectedItem().toString());
+			recetaList.setTiempoTotal(minutosTotal*60 + segundosTotal);
+			recetaList.setTiempoThermomix(minutosThermo*60 + segundosThermo);
+
+			receta.setNombre(nombreText.getText());
+			receta.setCantidad(Integer.parseInt(paraText.getText()));
+			receta.setCategoria((CategoriaItem)categoriasListButton.getSelectedItem());
+			receta.setPara(paraCombo.getSelectedItem().toString());
+			receta.setTiempoTotal(minutosTotal*60 + segundosTotal);
+			receta.setTiempoThermomix(minutosThermo*60 + segundosThermo);
+
+			receta.getSecciones().removeAll(receta.getSecciones());
+
+			for (ComponenteReceta componente : componentes) {
+				receta.getSecciones().add(componente.getSeccion());
+			}
+
+			try {
+				ServiceLocator.getRecetasService().modificarReceta(receta);
+				RecetasPanel.variables.update(posicionRecetaListSeleccionada, recetaList);
+				RecetasPanel.tableView.setTableData(RecetasPanel.variables);
+			} catch (ServiceException e) {
+			}
+
+			close();
+		}
 	}
 
 	protected void crearNuevoPanelComponente() {
@@ -138,7 +148,7 @@ public class EditarRecetaWindow extends Window implements Bindable {
 			BXMLSerializer serializer = new BXMLSerializer();
 			ComponenteReceta componenteReceta = (ComponenteReceta) serializer.readObject(bxmlUrl);
 			componenteReceta.setParent(this);
-			
+
 			tabPaneEditarReceta.getTabs().insert(componenteReceta,tabPaneEditarReceta.getLength() - 2);
 			tabPaneEditarReceta.setSelectedTab(componenteReceta);
 			componentes.add(componenteReceta);
@@ -158,14 +168,14 @@ public class EditarRecetaWindow extends Window implements Bindable {
 			ComponenteReceta componenteReceta = (ComponenteReceta) serializer.readObject(bxmlUrl);
 
 			componenteReceta.setParent(this);
-			
+
 			tabPaneEditarReceta.getTabs().insert(componenteReceta,tabPaneEditarReceta.getLength() - 2);
 			tabPaneEditarReceta.setSelectedTab(componenteReceta);
 			tabPaneEditarReceta.setTabData(tabPaneEditarReceta.getSelectedTab(), texto);
 			componenteReceta.setSeccionText(texto);
 			componenteReceta.setVariablesIngredientes(convertirList(ingredientes));
 			componenteReceta.setVariablesInstrucciones(convertirList(instrucciones));
-			
+
 			componentes.add(componenteReceta);
 
 		} catch (IOException | SerializationException e) {
@@ -211,16 +221,16 @@ public class EditarRecetaWindow extends Window implements Bindable {
 		}
 		return listaApache;
 	}
-	
+
 	public void setReceta(RecetaListItem recetaList){
 		this.recetaList = recetaList;
 		id = recetaList.getId();
-		
+
 		try {
 			receta = ServiceLocator.getRecetasService().obtenerReceta(id);
 		} catch (ServiceException e1) {
 		}
-		
+
 		int minutosTotal = receta.getTiempoTotal() / 60;
 		int segundosTotal = receta.getTiempoTotal() % 60;
 		int minutosThermo = receta.getTiempoThermomix() / 60;
@@ -232,7 +242,7 @@ public class EditarRecetaWindow extends Window implements Bindable {
 		spinnerThermoS.setSelectedIndex(segundosThermo);
 		spinnerTotalM.setSelectedIndex(minutosTotal);
 		spinnerTotalS.setSelectedIndex(segundosTotal);
-		
+
 		if(receta.getSecciones().size() == 0){
 			crearNuevoPanelComponente();
 		}
@@ -250,6 +260,6 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	public void setPosicionRecetaListSeleccionada(int posicionRecetaListSeleccionada) {
 		this.posicionRecetaListSeleccionada = posicionRecetaListSeleccionada;
 	}
-	
-	
+
+
 }

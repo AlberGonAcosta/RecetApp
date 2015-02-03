@@ -181,7 +181,7 @@ public class RecetasPanel extends FillPane implements Bindable {
 	public static void recargarCategoriaListButton() throws ServiceException {
 		CategoriaItem categoriaTitle = new CategoriaItem();
 		categoriaTitle.setId(null);
-		categoriaTitle.setDescripcion("<Categorías>");
+		categoriaTitle.setDescripcion("<Todas>");
 		categoriasBD = convertirList(ServiceLocator.getCategoriasService()
 				.listarCategorias());
 		categoriasBD.insert(categoriaTitle, 0);
