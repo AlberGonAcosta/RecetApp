@@ -128,7 +128,9 @@ public class EditarRecetaWindow extends Window implements Bindable {
 			receta.getSecciones().removeAll(receta.getSecciones());
 
 			for (ComponenteReceta componente : componentes) {
-				receta.getSecciones().add(componente.getSeccion());
+				if(!componente.getSeccion().getNombre().equals("")){
+					receta.getSecciones().add(componente.getSeccion());
+				}
 			}
 
 			try {
@@ -137,7 +139,6 @@ public class EditarRecetaWindow extends Window implements Bindable {
 				RecetasPanel.tableView.setTableData(RecetasPanel.variables);
 			} catch (ServiceException e) {
 			}
-
 			close();
 		}
 	}
@@ -189,7 +190,6 @@ public class EditarRecetaWindow extends Window implements Bindable {
 	}
 
 	public static void eliminarPestanaActual() {
-
 		if (tabPaneEditarReceta.getTabs().getLength() > 0) {
 			int posicion = tabPaneEditarReceta.getSelectedIndex();
 			if (posicion == 0) {
@@ -199,11 +199,6 @@ public class EditarRecetaWindow extends Window implements Bindable {
 			}
 			componentes.remove(posicion);
 			tabPaneEditarReceta.getTabs().remove(posicion, 1);
-		} else if (tabPaneEditarReceta.getTabs().getLength() == 2) {
-
-			tabPaneEditarReceta.setSelectedIndex(tabPaneEditarReceta.getTabs().getLength() - 1);
-			tabPaneEditarReceta.getTabs().remove(tabPaneEditarReceta.getSelectedIndex() - 1, 1);
-			componentes.remove(tabPaneEditarReceta.getSelectedIndex() - 1);
 		}
 	}
 
